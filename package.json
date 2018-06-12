@@ -1,0 +1,13 @@
+{
+  "name": "discord",
+  "version": "1.0.0",
+  "description": "Hack Chicago Discord bot",
+  "main": "app.js",
+  "repository": "https://github.com/hackchicago/discord",
+  "author": "@zanedb",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "dotenv": "^6.0.0"
+  }
+}
