@@ -32,6 +32,8 @@ client.on('message', (msg) => {
 
   // !social
   if (msg.content == '!social') msg.channel.send('**Check us out below:**\n\nTwitter: https://twitter.com/hackchicago18\nInstagram: https://www.instagram.com/hackchicago\nFacebook: https://facebook.com/hackchicago\n\n**Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/')
+  // !sponsors
+  if (msg.content == '!sponsors') msg.channel.send('**We\'d like to thank our amazing sponsors!**\n\n- McDonalds: https://www.mcdonalds.com\n- Paylocity: https://www.paylocity.com\n- Balsamiq: https://balsamiq.com\n- Flexera: https://www.flexera.com\n- Neighborhoods.com: https://www.neighborhoods.com\n- Repl.it: https://repl.it\n- Belvedere Trading: https://www.belvederetrading.com\n- Civis Analytics: https://new.civisanalytics.com\n- Tastytrade: https://www.tastytrade.com/tt/\n- Tastyworks: https://tastyworks.com/');
 
   // DEBUG
   //console.log('message: '+msg.content)
