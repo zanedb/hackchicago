@@ -6,6 +6,10 @@ const client = new Discord.Client();
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  let game = '!help for help';
+  client.user.setActivity(game, { type: 'PLAYING' })
+    .then(console.log('Running: '+game))
+    .catch(console.error);
 });
 
 client.on('message', (msg) => {
