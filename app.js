@@ -1,17 +1,197 @@
 // .env variables
 require('dotenv').config();
 
+// setup discord.js
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+// setup Express server
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+// configure body-parser
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+// set port
+const port = process.env.PORT || 3000;
+// setup router
+const router = express.Router();
+
+// middleware to use for all requests
+router.use(function(req, res, next) {
+  console.log('Request received..');
+  next(); // make sure we go to the next route and don't stop here
+});
+
+// accessed at http://localhost:3000/api
+router.get('/', function(req, res) {
+  if (req.body.auth === process.env.AUTH_KEY) {
+    res.json({ message: 'API loaded successfully' });
+  } else {
+    res.status(403).json({ message: 'Please authenticate.' });
+  }
+});
+
+router.route('/attendees')
+  // create an attendee (accessed at POST http://localhost:3000/api/attendees)
+  .post(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      let attendee = new Attendee();
+      // set params from request
+      attendee.fname = req.body.fname;
+      attendee.lname = req.body.lname;
+      attendee.email = req.body.email;
+
+      // save and check for errors
+      attendee.save(function(err) {
+        if (err) res.send(err);
+
+        res.json({ message: 'Attendee created!' });
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  })
+  .get(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      Attendee.find(function(err, attendees) {
+        if (err) res.send(err);
+
+        res.json(attendees);
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  });
+
+// get/update/delete attendees by email
+router.route('/attendees/email/:attendee_email')
+  // get the attendee with that id (accessed at GET http://localhost:8080/api/attendees/email/:attendee_email)
+  .get(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+        if (err) res.send(err);
+
+        res.json(attendee);
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  })
+  // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/email/:attendee_email)
+  .put(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      // find & update attendee
+      Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+        if (err) res.send(err);
+
+        if(req.body.fname || req.body.lname || req.body.email) {
+          if (req.body.fname) attendee.fname = req.body.fname;
+          if (req.body.lname) attendee.lname = req.body.lname;
+          if (req.body.email) attendee.email = req.body.email;
+
+          // save the updated attendee data
+          attendee.save(function(err) {
+            if (err) res.send(err);
+
+            res.json({ message: 'Attendee updated!' });
+          });
+        } else {
+          res.status(400).json({ message: 'Attendee not updated!' });
+        }
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  })
+  .delete(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      Attendee.remove({
+        email: req.params.attendee_email
+      }, function(err, attendee) {
+        if (err)
+          res.send(err);
+        else
+          res.json({ message: 'Successfully deleted attendee' });
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  });
+
+// get/update/delete attendees by ID
+router.route('/attendees/id/:attendee_id')
+  // get the attendee with that id (accessed at GET http://localhost:8080/api/attendees/id/:attendee_id)
+  .get(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      Attendee.findById(req.params.attendee_id, function(err, attendee) {
+        if (err) res.send(err);
+
+        res.json(attendee);
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  })
+  // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/id/:attendee_id)
+  .put(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      // find & update attendee
+      Attendee.findById(req.params.attendee_id, function(err, attendee) {
+        if (err) res.send(err);
+
+        if(req.body.fname || req.body.lname || req.body.email) {
+          if (req.body.fname) attendee.fname = req.body.fname;
+          if (req.body.lname) attendee.lname = req.body.lname;
+          if (req.body.email) attendee.email = req.body.email;
+
+          // save the updated attendee data
+          attendee.save(function(err) {
+            if (err) res.send(err);
+
+            res.json({ message: 'Attendee updated!' });
+          });
+        } else {
+          res.status(400).json({ message: 'Attendee not updated!' });
+        }
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  })
+  .delete(function(req, res) {
+    if (req.body.auth === process.env.AUTH_KEY) {
+      Attendee.remove({
+        _id: req.params.attendee_id
+      }, function(err, attendee) {
+        if (err) res.send(err);
+
+        res.json({ message: 'Successfully deleted attendee' });
+      });
+    } else {
+      res.status(403).json({ message: 'Please authenticate.' });
+    }
+  });
+
+// setup Router with Express
+app.use('/api', router);
+
+// setup MongoDB
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB_URI);
+// load in attendee model
+const Attendee = require('./app/models/attendee');
+
+// setup discord bot on load
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   let game = '!help for help';
   client.user.setActivity(game, { type: 'PLAYING' })
-    .then(console.log('Running: '+game))
+    .then(console.log('Running game: '+game))
     .catch(console.error);
 });
 
+// on discord message
 client.on('message', (msg) => {
   // make sure Orpheus doesn't react to her own message
   if (msg.author !== client.user) {
@@ -51,7 +231,15 @@ client.on('message', (msg) => {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       if (re.test(String(msg.content).toLowerCase())) {
         msg.channel.send('I see ya slidin into the DMs ;)');
-        msg.channel.send('Processing..');
+        Attendee.find({ email: msg.content }, function(err, attendee) {
+          if (err) console.log(err);
+
+          if(attendee.length == 0) {
+            msg.channel.send('You are not an attendee.');
+          } else {
+            msg.channel.send('Welcome aboard, '+attendee[0].fname+'!');
+          }
+        });
       } else {
         msg.channel.send('Invalid email address');
       }
@@ -64,4 +252,7 @@ client.on('guildMemberAdd', member => {
 });
 
 // login to bot using token in .env
-client.login(process.env.TOKEN);
+client.login(process.env.DISCORD_TOKEN);
+// start Express server
+app.listen(port);
+console.log('Express server is running on port '+port)
