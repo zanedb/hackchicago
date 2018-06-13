@@ -277,6 +277,7 @@ function sendStat(message) {
   let orgChannel = guild.channels.get('456541536658784266'); // #stat channel ID
 
   orgChannel.send(message);
+  console.log('stat: '+message);
 }
 
 function registerUser(attendee, msg) {
