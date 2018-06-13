@@ -30,6 +30,9 @@ client.on('message', (msg) => {
   // !website
   if (msg.content == '!website') msg.channel.send('Check out our **website** at https://hackchicago.io/.'/* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/);
 
+  // !social
+  if (msg.content == '!social') msg.channel.send('**Check us out below:**\n\nTwitter: https://twitter.com/hackchicago18\nInstagram: https://www.instagram.com/hackchicago\nFacebook: https://facebook.com/hackchicago\n\n**Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/')
+
   // DEBUG
   //console.log('message: '+msg.content)
 });
