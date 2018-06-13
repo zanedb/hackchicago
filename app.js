@@ -17,160 +17,132 @@ const port = process.env.PORT || 3000;
 // setup router
 const router = express.Router();
 
-// middleware to use for all requests
-router.use(function(req, res, next) {
-  console.log('Request received..');
-  next(); // make sure we go to the next route and don't stop here
+app.get('/', function(req, res) {
+  res.status(404).json({ message: '404 not found, please use /api' })
 });
 
-// accessed at http://localhost:3000/api
-router.get('/', function(req, res) {
+// middleware to use for all requests
+router.use(function(req, res, next) {
   if (req.body.auth === process.env.AUTH_KEY) {
-    res.json({ message: 'API loaded successfully' });
+    console.log('Request received..');
+    next(); // make sure we go to the next route and don't stop here
   } else {
     res.status(403).json({ message: 'Please authenticate.' });
   }
 });
 
+// accessed at http://localhost:3000/api
+router.get('/', function(req, res) {
+  res.json({ message: 'API loaded successfully' });
+});
+
 router.route('/attendees')
   // create an attendee (accessed at POST http://localhost:3000/api/attendees)
   .post(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      let attendee = new Attendee();
-      // set params from request
-      attendee.fname = req.body.fname;
-      attendee.lname = req.body.lname;
-      attendee.email = req.body.email;
+    let attendee = new Attendee();
+    // set params from request
+    attendee.fname = req.body.fname;
+    attendee.lname = req.body.lname;
+    attendee.email = req.body.email;
 
-      // save and check for errors
-      attendee.save(function(err) {
-        if (err) res.send(err);
+    // save and check for errors
+    attendee.save(function(err) {
+      if (err) res.send(err);
 
-        res.json({ message: 'Attendee created!' });
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+      res.json({ message: 'Attendee created!' });
+    });
   })
   .get(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      Attendee.find(function(err, attendees) {
-        if (err) res.send(err);
+    Attendee.find(function(err, attendees) {
+      if (err) res.send(err);
 
-        res.json(attendees);
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+      res.json(attendees);
+    });
   });
 
 // get/update/delete attendees by email
 router.route('/attendees/email/:attendee_email')
   // get the attendee with that id (accessed at GET http://localhost:8080/api/attendees/email/:attendee_email)
   .get(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
-        if (err) res.send(err);
+    Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+      if (err) res.send(err);
 
-        res.json(attendee);
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+      res.json(attendee);
+    });
   })
   // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/email/:attendee_email)
   .put(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      // find & update attendee
-      Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
-        if (err) res.send(err);
+    // find & update attendee
+    Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+      if (err) res.send(err);
 
-        if(req.body.fname || req.body.lname || req.body.email) {
-          if (req.body.fname) attendee.fname = req.body.fname;
-          if (req.body.lname) attendee.lname = req.body.lname;
-          if (req.body.email) attendee.email = req.body.email;
+      if(req.body.fname || req.body.lname || req.body.email) {
+        if (req.body.fname) attendee.fname = req.body.fname;
+        if (req.body.lname) attendee.lname = req.body.lname;
+        if (req.body.email) attendee.email = req.body.email;
 
-          // save the updated attendee data
-          attendee.save(function(err) {
-            if (err) res.send(err);
+        // save the updated attendee data
+        attendee.save(function(err) {
+          if (err) res.send(err);
 
-            res.json({ message: 'Attendee updated!' });
-          });
-        } else {
-          res.status(400).json({ message: 'Attendee not updated!' });
-        }
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+          res.json({ message: 'Attendee updated!' });
+        });
+      } else {
+        res.status(400).json({ message: 'Attendee not updated!' });
+      }
+    });
   })
   .delete(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      Attendee.remove({
-        email: req.params.attendee_email
-      }, function(err, attendee) {
-        if (err)
-          res.send(err);
-        else
-          res.json({ message: 'Successfully deleted attendee' });
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+    Attendee.remove({
+      email: req.params.attendee_email
+    }, function(err, attendee) {
+      if (err)
+        res.send(err);
+      else
+        res.json({ message: 'Successfully deleted attendee' });
+    });
   });
 
 // get/update/delete attendees by ID
 router.route('/attendees/id/:attendee_id')
   // get the attendee with that id (accessed at GET http://localhost:8080/api/attendees/id/:attendee_id)
   .get(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      Attendee.findById(req.params.attendee_id, function(err, attendee) {
-        if (err) res.send(err);
+    Attendee.findById(req.params.attendee_id, function(err, attendee) {
+      if (err) res.send(err);
 
-        res.json(attendee);
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+      res.json(attendee);
+    });
   })
   // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/id/:attendee_id)
   .put(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      // find & update attendee
-      Attendee.findById(req.params.attendee_id, function(err, attendee) {
-        if (err) res.send(err);
+    // find & update attendee
+    Attendee.findById(req.params.attendee_id, function(err, attendee) {
+      if (err) res.send(err);
 
-        if(req.body.fname || req.body.lname || req.body.email) {
-          if (req.body.fname) attendee.fname = req.body.fname;
-          if (req.body.lname) attendee.lname = req.body.lname;
-          if (req.body.email) attendee.email = req.body.email;
+      if(req.body.fname || req.body.lname || req.body.email) {
+        if (req.body.fname) attendee.fname = req.body.fname;
+        if (req.body.lname) attendee.lname = req.body.lname;
+        if (req.body.email) attendee.email = req.body.email;
 
-          // save the updated attendee data
-          attendee.save(function(err) {
-            if (err) res.send(err);
+        // save the updated attendee data
+        attendee.save(function(err) {
+          if (err) res.send(err);
 
-            res.json({ message: 'Attendee updated!' });
-          });
-        } else {
-          res.status(400).json({ message: 'Attendee not updated!' });
-        }
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+          res.json({ message: 'Attendee updated!' });
+        });
+      } else {
+        res.status(400).json({ message: 'Attendee not updated!' });
+      }
+    });
   })
   .delete(function(req, res) {
-    if (req.body.auth === process.env.AUTH_KEY) {
-      Attendee.remove({
-        _id: req.params.attendee_id
-      }, function(err, attendee) {
-        if (err) res.send(err);
+    Attendee.remove({
+      _id: req.params.attendee_id
+    }, function(err, attendee) {
+      if (err) res.send(err);
 
-        res.json({ message: 'Successfully deleted attendee' });
-      });
-    } else {
-      res.status(403).json({ message: 'Please authenticate.' });
-    }
+      res.json({ message: 'Successfully deleted attendee' });
+    });
   });
 
 // setup Router with Express
