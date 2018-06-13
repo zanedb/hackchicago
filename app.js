@@ -183,7 +183,12 @@ client.on('ready', () => {
   client.user.setActivity(game, { type: 'PLAYING' })
     .then(console.log('Running game: '+game))
     .catch(console.error);
-  sendStat('test');
+  sendStat('<@&456539994719518750>: Bot is live!');
+});
+
+// handle system error
+process.on('uncaughtException', function(ex) {
+  sendStat('<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n```'+ex+'```');
 });
 
 // on discord message
