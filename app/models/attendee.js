@@ -4,7 +4,10 @@ const Schema = mongoose.Schema;
 var AttendeeSchema = new Schema({
   fname: String,
   lname: String,
-  email: String
+  email: String,
+  location: String,
+  discordId: String,
+  hasRegistered: Boolean
 });
 
 module.exports = mongoose.model('Attendee', AttendeeSchema);

@@ -39,17 +39,26 @@ router.get('/', function(req, res) {
 router.route('/attendees')
   // create an attendee (accessed at POST http://localhost:3000/api/attendees)
   .post(function(req, res) {
-    let attendee = new Attendee();
-    // set params from request
-    attendee.fname = req.body.fname;
-    attendee.lname = req.body.lname;
-    attendee.email = req.body.email;
+    Attendee.find({ email: req.body.email }, function(err, attendee) {
+      if (attendee.length == 0) {
+        let attendee = new Attendee();
+        // set params from request
+        attendee.fname = req.body.fname;
+        attendee.lname = req.body.lname;
+        attendee.email = req.body.email;
+        attendee.location = req.body.location;
+        attendee.hasRegistered = false;
 
-    // save and check for errors
-    attendee.save(function(err) {
-      if (err) res.send(err);
+        // save and check for errors
+        attendee.save(function(err, attendee) {
+          if (err) res.send(err);
 
-      res.json({ message: 'Attendee created!' });
+          res.json({ message: 'Attendee created!' });
+          sendStat('API: SUCCESS created attendee with EMAIL '+req.body.email+', ID '+attendee.id);
+        });
+      } else {
+        res.status(400).json({ message: 'Attendee with that email already exists' });
+      }
     });
   })
   .get(function(req, res) {
@@ -76,16 +85,18 @@ router.route('/attendees/email/:attendee_email')
     Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
       if (err) res.send(err);
 
-      if(req.body.fname || req.body.lname || req.body.email) {
+      if(req.body.fname || req.body.lname || req.body.email || req.body.location) {
         if (req.body.fname) attendee.fname = req.body.fname;
         if (req.body.lname) attendee.lname = req.body.lname;
         if (req.body.email) attendee.email = req.body.email;
+        if (req.body.location) attendee.location = req.body.location;
 
         // save the updated attendee data
         attendee.save(function(err) {
           if (err) res.send(err);
 
           res.json({ message: 'Attendee updated!' });
+          sendStat('API: SUCCESS updated attendee by EMAIL '+req.params.attendee_email);
         });
       } else {
         res.status(400).json({ message: 'Attendee not updated!' });
@@ -93,13 +104,21 @@ router.route('/attendees/email/:attendee_email')
     });
   })
   .delete(function(req, res) {
-    Attendee.remove({
-      email: req.params.attendee_email
-    }, function(err, attendee) {
-      if (err)
-        res.send(err);
-      else
-        res.json({ message: 'Successfully deleted attendee' });
+    Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+      if (attendee.length == 0) {
+        res.status(400).json({ message: 'Invalid attendee' });
+      } else {
+        Attendee.remove({
+          email: req.params.attendee_email
+        }, function(err, deleted_attendee) {
+          if (err) {
+            res.send(err);
+          } else {
+            res.json({ message: 'Successfully deleted attendee' });
+            sendStat('API: SUCCESS deleted attendee by EMAIL '+req.params.attendee_email+', ID '+attendee[0].id);
+          }
+        });
+      }
     });
   });
 
@@ -119,16 +138,18 @@ router.route('/attendees/id/:attendee_id')
     Attendee.findById(req.params.attendee_id, function(err, attendee) {
       if (err) res.send(err);
 
-      if(req.body.fname || req.body.lname || req.body.email) {
+      if(req.body.fname || req.body.lname || req.body.email || req.body.location) {
         if (req.body.fname) attendee.fname = req.body.fname;
         if (req.body.lname) attendee.lname = req.body.lname;
         if (req.body.email) attendee.email = req.body.email;
+        if (req.body.location) attendee.location = req.body.location;
 
         // save the updated attendee data
         attendee.save(function(err) {
           if (err) res.send(err);
 
           res.json({ message: 'Attendee updated!' });
+          sendStat('API: SUCCESS updated attendee with ID '+req.params.attendee_id);
         });
       } else {
         res.status(400).json({ message: 'Attendee not updated!' });
@@ -141,6 +162,7 @@ router.route('/attendees/id/:attendee_id')
     }, function(err, attendee) {
       if (err) res.send(err);
 
+      sendStat('API: Successfully deleted attendee by ID '+req.params.attendee_id);
       res.json({ message: 'Successfully deleted attendee' });
     });
   });
@@ -167,60 +189,152 @@ client.on('ready', () => {
 client.on('message', (msg) => {
   // make sure Orpheus doesn't react to her own message
   if (msg.author !== client.user) {
-    // ping pong
-    if(msg.content == 'ping') msg.channel.send('pong');
-
-    // !about
-    if (msg.content == '!about') msg.channel.send('**Hi, I\'m Orpheus. I\'m Hack Club & Hack Chicago\'s Robot Dinosaur!** Here are a few links about me:\n\n- My Origin Story: https://hackclub.com/workshops/orpheus\n- More Pictures of Me: https://github.com/hackclub/dinosaurs\n- Hack Club (my creators): https://hackclub.com');
-
-    // !help
-    if (msg.content == '!help') msg.channel.send('**Hi, I\'m Orpheus, the official Hack Chicago Dino! I can: **\n- Show you the full list of commands: `!commands`\n- Point you to <#456267567095611392> for mentor help\n- Point you to <#456267748658380812> for staff help\n- List our organizers: `!organizers`\n- Inform you of Hack Chicago rules: `!rules`')
-
-    // !commands
-    if (msg.content == '!commands') msg.channel.send('**Commands:**\n- `!about`: Learn more about me :robot: \n- `!help`: Get help from me :raised_back_of_hand: \n- `!commands`: This one! :point_up_2: \n- `!rules`: List the rules :straight_ruler: \n- `!organizers`: List all organizers :bust_in_silhouette:\n- `!website`: Learn about our website :computer: \n- `!social`: Check out our social media :chart_with_upwards_trend: \n- `!sponsors`: View our lovely sponsors :blush: ');
-
-    // !rules
-    if (msg.content == '!rules') msg.channel.send('**Rules:**\nYou must adhere to both the Hack Club & MLH Code of Conducts.\n\n- Hack Club Code of Conduct: https://conduct.hackclub.com/\n- MLH Code of Conduct: https://github.com/MLH/mlh-policies/blob/master/code-of-conduct.md');
-
-    // !organizers
-    if (msg.content == '!organizers') msg.channel.send('**Organizers:**\n\n- Amy C.: Marketing Team\n- Annie W.: Design Team\n- Ava S.: Marketing Team\n- Bhargav Y.: Finance Team\n- Megan C.: Operations Lead\n- Michael P.: Logistics Team\n- Mingjie J.: Marketing Lead\n- Musa K.: Marketing Team\n- Sean K.: Logistics Team\n- Victor T.: Tech Team\n- Yev B.: Tech Team\n- Zane D.: Tech Lead\n\n**And of course, our beloved Orpheus!**');
-
-    // !website
-    if (msg.content == '!website') msg.channel.send('Check out our **website** at https://hackchicago.io/.'/* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/);
-
-    // !social
-    if (msg.content == '!social') msg.channel.send('**Check us out below:**\n\n- Twitter: https://twitter.com/hackchicago18\n- Instagram: https://www.instagram.com/hackchicago\n- Facebook: https://facebook.com/hackchicago\n\n**Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/');
-
-    // !sponsors
-    if (msg.content == '!sponsors') msg.channel.send('**We\'d like to thank our amazing sponsors!**\n\n- McDonalds: https://www.mcdonalds.com\n- Paylocity: https://www.paylocity.com\n- Balsamiq: https://balsamiq.com\n- Flexera: https://www.flexera.com\n- Neighborhoods.com: https://www.neighborhoods.com\n- Repl.it: https://repl.it\n- Belvedere Trading: https://www.belvederetrading.com\n- Civis Analytics: https://new.civisanalytics.com\n- Tastytrade: https://www.tastytrade.com/tt/\n- Tastyworks: https://tastyworks.com/');
-
-    // DEBUG
-    console.log('message: '+msg.content)
-
     // check if message is in DM
     if (msg.guild == null) {
-      // if so, check for valid email address
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if (re.test(String(msg.content).toLowerCase())) {
-        msg.channel.send('I see ya slidin into the DMs ;)');
-        Attendee.find({ email: msg.content }, function(err, attendee) {
-          if (err) console.log(err);
+      // check if Discord user has already been authenticated
+      Attendee.find({ discordId: msg.author.id }, function(err, attendee_discord) {
+        // if account hasn't been authed, allow auth
+        if (attendee_discord.length == 0) {
+          // if so, check for valid email address
+          var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (re.test(String(msg.content).toLowerCase())) {
+            Attendee.find({ email: msg.content }, function(err, attendee) {
+              if (err) console.log(err);
 
-          if(attendee.length == 0) {
-            msg.channel.send('You are not an attendee.');
+              // check if DB returns blank data
+              if(attendee.length == 0) {
+                msg.channel.send('**You are not an attendee.**');
+              } else {
+                // otherwise, ensure the attendee hasn't already registered before continuing
+                if(attendee[0].hasRegistered == false) {
+                  // update attendee to be registered (hasRegistered = true)
+                  Attendee.update({ email: msg.content }, { hasRegistered: true, discordId: msg.author.id }, function (err, raw) {
+                    // if attendee data is saved, register user on server
+                    if (raw.ok = 1) {
+                      registerUser(attendee, msg);
+                    } else {
+                      msg.channel.send('An error occurred, **organizers have been notified.**');
+                      sendStat('<@&456539994719518750>: ERROR: Attendee with ID '+attendee[0].id+' and EMAIL '+attendee[0].email+' could NOT update hasRegistered (true) or discordId ('+id+').')
+                    }
+                  });
+                } else if (attendee[0].hasRegistered == null) {
+                  msg.channel.send('An error occurred when fetching your attendee data. **Organizers have been notified.**')
+                  sendStat('<@&456539994719518750>: ERROR: Attendee '+attendee[0].id+' ('+attendee[0].email+') has invalid "hasRegistered" state.'); // mention the @Dev role
+                } else {
+                  msg.channel.send('You have already registered. **Please contact an organizer for help.**');
+                  sendStat('WARN: Attendee '+attendee[0].id+' ('+attendee[0].email+') is attempting to re-register.');
+                }
+              }
+            });
           } else {
-            msg.channel.send('Welcome aboard, '+attendee[0].fname+'!');
+            msg.channel.send('**Invalid email address! If you haven\'t yet signed up, head to https://hackchicago.io to do so!**');
           }
-        });
-      } else {
-        msg.channel.send('Invalid email address');
-      }
+        } else {
+          // discord account is already registered, orpheus should _not_ respond to messages
+          //msg.channel.send('This Discord account is already registered.');
+        }
+      });
+    } else {
+      // IS IN SERVER, SEND COMMANDS
+      // ping pong
+      if(msg.content == 'ping') msg.channel.send('pong');
+
+      // !about
+      if (msg.content == '!about') msg.channel.send('**Hi, I\'m Orpheus. I\'m Hack Club & Hack Chicago\'s Robot Dinosaur!** Here are a few links about me:\n\n- My Origin Story: https://hackclub.com/workshops/orpheus\n- More Pictures of Me: https://github.com/hackclub/dinosaurs\n- Hack Club (my creators): https://hackclub.com');
+
+      // !help
+      if (msg.content == '!help') msg.channel.send('**Hi, I\'m Orpheus, the official Hack Chicago Dino! I can: **\n- Show you the full list of commands: `!commands`\n- Point you to <#456267567095611392> for mentor help\n- Point you to <#456267748658380812> for staff help\n- List our organizers: `!organizers`\n- Inform you of Hack Chicago rules: `!rules`')
+
+      // !commands
+      if (msg.content == '!commands') msg.channel.send('**Commands:**\n- `!about`: Learn more about me :robot: \n- `!help`: Get help from me :raised_back_of_hand: \n- `!commands`: This one! :point_up_2: \n- `!rules`: List the rules :straight_ruler: \n- `!organizers`: List all organizers :bust_in_silhouette:\n- `!website`: Learn about our website :computer: \n- `!social`: Check out our social media :chart_with_upwards_trend: \n- `!sponsors`: View our lovely sponsors :blush: ');
+
+      // !rules
+      if (msg.content == '!rules') msg.channel.send('**Rules:**\nYou must adhere to both the Hack Club & MLH Code of Conducts.\n\n- Hack Club Code of Conduct: https://conduct.hackclub.com/\n- MLH Code of Conduct: https://github.com/MLH/mlh-policies/blob/master/code-of-conduct.md');
+
+      // !organizers
+      if (msg.content == '!organizers') msg.channel.send('**Organizers:**\n\n- Amy C.: Marketing Team\n- Annie W.: Design Team\n- Ava S.: Marketing Team\n- Bhargav Y.: Finance Team\n- Megan C.: Operations Lead\n- Michael P.: Logistics Team\n- Mingjie J.: Marketing Lead\n- Musa K.: Marketing Team\n- Sean K.: Logistics Team\n- Victor T.: Tech Team\n- Yev B.: Tech Team\n- Zane D.: Tech Lead\n\n**And of course, our beloved Orpheus!**');
+
+      // !website
+      if (msg.content == '!website') msg.channel.send('Check out our **website** at https://hackchicago.io/.'/* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/);
+
+      // !social
+      if (msg.content == '!social') msg.channel.send('**Check us out below:**\n\n- Twitter: https://twitter.com/hackchicago18\n- Instagram: https://www.instagram.com/hackchicago\n- Facebook: https://facebook.com/hackchicago\n\n**Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/');
+
+      // !sponsors
+      if (msg.content == '!sponsors') msg.channel.send('**We\'d like to thank our amazing sponsors!**\n\n- McDonalds: https://www.mcdonalds.com\n- Paylocity: https://www.paylocity.com\n- Balsamiq: https://balsamiq.com\n- Flexera: https://www.flexera.com\n- Neighborhoods.com: https://www.neighborhoods.com\n- Repl.it: https://repl.it\n- Belvedere Trading: https://www.belvederetrading.com\n- Civis Analytics: https://new.civisanalytics.com\n- Tastytrade: https://www.tastytrade.com/tt/\n- Tastyworks: https://tastyworks.com/');
     }
   }
 });
 
+function sendStat(message) {
+  let guild = client.guilds.get('455396418199486465'); // hack chicago server ID
+  let orgChannel = guild.channels.get('456541536658784266'); // #stat channel ID
+
+  orgChannel.send(message);
+}
+
+function registerUser(attendee, msg) {
+  // locate user
+  let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  let id = msg.author.id;
+  let guildUser = guild.member(id)
+
+  // setup nickname to be real name (example: John D.)
+  let nickname = attendee[0].fname+' '+(attendee[0].lname).charAt(0)+'.';
+  // set user nickname
+  guildUser.setNickname(nickname)
+    .then(msg.channel.send('Part 1 complete..'))
+    .catch(function(error) { msg.channel.send('Error: '+error) });
+  // set to "Attendee" role
+  guildUser.addRole('455402838210773012')
+    .then(msg.channel.send('Part 2 complete..'))
+    .catch(function(error) { msg.channel.send('Error: '+error) });
+
+  // handle locations
+  if (attendee[0].location === 'Ohio') guildUser.addRole('456228521992519700');
+  if (attendee[0].location === 'Illinois') guildUser.addRole('456228742386155520');
+
+  // welcome user
+  msg.channel.send('**Welcome aboard, '+attendee[0].fname+'! Please return to the Hack Chicago server!**');
+  // inform organizers
+  sendStat('STAT: Attendee <@'+guildUser.user.id+'> with ID '+attendee[0].id+' and EMAIL '+attendee[0].email+' has just BEEN VERIFIED!');
+}
+
+function registerUserFirstTime(attendee, member) {
+  // locate user
+  let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  let id = member.id;
+  let guildUser = guild.member(id)
+
+  // setup nickname to be real name (example: John D.)
+  let nickname = attendee[0].fname+' '+(attendee[0].lname).charAt(0)+'.';
+  // set user nickname
+  guildUser.setNickname(nickname)
+    .then(console.log('Nickname set of new user'))
+    .catch(function(error) { console.log('Error: '+error) });
+  // set to "Attendee" role
+  guildUser.addRole('455402838210773012')
+    .then(console.log('Role set of new user'))
+    .catch(function(error) { console.log('Error: '+error) });
+
+  // handle locations
+  if (attendee[0].location === 'Ohio') guildUser.addRole('456228521992519700');
+  if (attendee[0].location === 'Illinois') guildUser.addRole('456228742386155520');
+
+  // welcome user
+  console.log('New user '+attendee[0].fname+' has been successfully onboarded');
+  // inform organizers
+  sendStat('STAT: REJOINING Attendee <@'+guildUser.user.id+'> with ID '+attendee[0].id+' and EMAIL '+attendee[0].email+' has just BEEN RE-VERIFIED!');
+}
+
 client.on('guildMemberAdd', member => {
-  member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
+  Attendee.find({ discordId: member.id }, function(err, attendee_discord) {
+    if (attendee_discord.length == 0) {
+      member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
+    } else {
+      registerUserFirstTime(attendee_discord, member)
+    }
+  });
 });
 
 // login to bot using token in .env
