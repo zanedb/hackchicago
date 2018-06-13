@@ -46,6 +46,17 @@ client.on('message', (msg) => {
   if (msg.guild == null) {
     // is DM
     console.log(msg.author.username+' is slidin in the DMs ;)')
+    // check if message is in DM
+    if (msg.guild == null) {
+      // if so, check for valid email address
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (re.test(String(msg.content).toLowerCase())) {
+        msg.channel.send('I see ya slidin into the DMs ;)');
+        msg.channel.send('Processing..');
+      } else {
+        msg.channel.send('Invalid email address');
+      }
+    }
   }
 });
 
