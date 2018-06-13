@@ -183,6 +183,7 @@ client.on('ready', () => {
   client.user.setActivity(game, { type: 'PLAYING' })
     .then(console.log('Running game: '+game))
     .catch(console.error);
+  sendStat('test');
 });
 
 // on discord message
