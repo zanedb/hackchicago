@@ -23,6 +23,8 @@ app.get('/', function(req, res) {
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   if (req.body.auth === process.env.AUTH_KEY) {
     console.log('Request received..');
     next(); // make sure we go to the next route and don't stop here
