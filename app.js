@@ -35,14 +35,22 @@ client.on('message', (msg) => {
   if (msg.content == '!website') msg.channel.send('Check out our **website** at https://hackchicago.io/.'/* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/);
 
   // !social
-  if (msg.content == '!social') msg.channel.send('**Check us out below:**\n\nTwitter: https://twitter.com/hackchicago18\nInstagram: https://www.instagram.com/hackchicago\nFacebook: https://facebook.com/hackchicago\n\n**Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/')
   if (msg.content == '!social') msg.channel.send('**Check us out below:**\n\n- Twitter: https://twitter.com/hackchicago18\n- Instagram: https://www.instagram.com/hackchicago\n- Facebook: https://facebook.com/hackchicago\n\n**Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/');
 
   // !sponsors
   if (msg.content == '!sponsors') msg.channel.send('**We\'d like to thank our amazing sponsors!**\n\n- McDonalds: https://www.mcdonalds.com\n- Paylocity: https://www.paylocity.com\n- Balsamiq: https://balsamiq.com\n- Flexera: https://www.flexera.com\n- Neighborhoods.com: https://www.neighborhoods.com\n- Repl.it: https://repl.it\n- Belvedere Trading: https://www.belvederetrading.com\n- Civis Analytics: https://new.civisanalytics.com\n- Tastytrade: https://www.tastytrade.com/tt/\n- Tastyworks: https://tastyworks.com/');
 
   // DEBUG
-  //console.log('message: '+msg.content)
+  console.log('message: '+msg.content)
+
+  if (msg.guild == null) {
+    // is DM
+    console.log(msg.author.username+' is slidin in the DMs ;)')
+  }
+});
+
+client.on('guildMemberAdd', member => {
+  member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
 });
 
 // login to bot using token in .env
