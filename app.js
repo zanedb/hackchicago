@@ -14,6 +14,11 @@ client.on('message', (msg) => {
     msg.channel.send('pong');
   }
 
+  // !about
+  if (msg.content == '!about') {
+    msg.channel.send('**Hi, I\'m Orpheus. I\'m Hack Club & Hack Chicago\'s Robot Dinosaur!** Here are a few links about me:\n\n- My Origin Story: https://hackclub.com/workshops/orpheus\n- More Pictures of Me: https://github.com/hackclub/dinosaurs\n- Hack Club (my creators): https://hackclub.com');
+  }
+
   // !help
   if (msg.content == '!help') {
     msg.channel.send('**Hi, I\'m Orpheus, the official Hack Chicago Dino! I can: **\n- Show you the full list of commands: `!commands`\n- Point you to <#456267567095611392> for mentor help\n- Point you to <#456267748658380812> for staff help\n- List our organizers: `!organizers`\n- Inform you of Hack Chicago rules: `!rules`')
