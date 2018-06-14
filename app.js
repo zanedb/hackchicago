@@ -300,7 +300,7 @@ function registerUser(attendee, msg) {
   sendStat('STAT: Attendee <@'+guildUser.user.id+'> with ID '+attendee[0].id+' and EMAIL '+attendee[0].email+' has just BEEN VERIFIED!');
 }
 
-function registerUserFirstTime(attendee, member) {
+function registerUserAgain(attendee, member) {
   // locate user
   let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
   let id = member.id;
@@ -332,7 +332,7 @@ client.on('guildMemberAdd', member => {
     if (attendee_discord.length == 0) {
       member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
     } else {
-      registerUserFirstTime(attendee_discord, member)
+      registerUserAgain(attendee_discord, member)
     }
   });
 });
