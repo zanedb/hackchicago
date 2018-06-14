@@ -23,6 +23,8 @@ app.get('/', function(req, res) {
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   if (req.body.auth === process.env.AUTH_KEY) {
     console.log('Request received..');
     next(); // make sure we go to the next route and don't stop here
@@ -183,6 +185,12 @@ client.on('ready', () => {
   client.user.setActivity(game, { type: 'PLAYING' })
     .then(console.log('Running game: '+game))
     .catch(console.error);
+  sendStat('<@&456539994719518750>: Bot is live!');
+});
+
+// handle system error
+process.on('uncaughtException', function(ex) {
+  sendStat('<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n```'+ex+'```');
 });
 
 // on discord message
@@ -271,6 +279,7 @@ function sendStat(message) {
   let orgChannel = guild.channels.get('456541536658784266'); // #stat channel ID
 
   orgChannel.send(message);
+  console.log('stat: '+message);
 }
 
 function registerUser(attendee, msg) {
