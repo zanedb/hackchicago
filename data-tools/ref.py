@@ -3,6 +3,7 @@
 
 import sys, getopt
 import json
+from collections import Counter
 
 # get command line arguments
 def main(argv):
@@ -26,10 +27,16 @@ def main(argv):
 def read_json(file):
     with open(file) as json_data:
         data = json.load(json_data)
+        referrals = []
         for element in data:
             ref = element['REFBY']
             if ref != "":
-                print('Ref: '+element['REFBY'])
+                referrals.append(ref)
+        cnt = Counter(referrals)
+        # print all referrals, in order from greatest to lowest
+        print('All referrals:')
+        for ref_person in cnt.most_common():
+            print(ref_person)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
