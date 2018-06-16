@@ -88,7 +88,11 @@ router.route('/attendees/email/:attendee_email')
     Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
       if (err) res.send(err);
 
-      res.json(attendee);
+      if (attendee.length == 0) {
+        res.status(400).json({ message: 'Invalid email' })
+      } else {
+        res.json(attendee);
+      }
     });
   })
   // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/email/:attendee_email)
