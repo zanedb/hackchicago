@@ -5,7 +5,8 @@ var AttendeeSchema = new Schema({
   fname: String,
   lname: String,
   email: String,
-  location: String,
+  state: String,
+  city: String,
   discordId: String,
   hasRegistered: Boolean
 });

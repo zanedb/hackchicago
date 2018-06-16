@@ -58,7 +58,8 @@ router.route('/attendees')
         attendee.fname = req.body.fname;
         attendee.lname = req.body.lname;
         attendee.email = req.body.email;
-        attendee.location = req.body.location;
+        attendee.state = req.body.state;
+        attendee.city = req.body.city;
         attendee.hasRegistered = false;
 
         // save and check for errors
@@ -101,11 +102,12 @@ router.route('/attendees/email/:attendee_email')
     Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
       if (err) res.send(err);
 
-      if(req.body.fname || req.body.lname || req.body.email || req.body.location) {
+      if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city) {
         if (req.body.fname) attendee.fname = req.body.fname;
         if (req.body.lname) attendee.lname = req.body.lname;
         if (req.body.email) attendee.email = req.body.email;
-        if (req.body.location) attendee.location = req.body.location;
+        if (req.body.state) attendee.state = req.body.state;
+        if (req.body.city) attendee.city = req.body.city;
 
         // save the updated attendee data
         attendee.save(function(err) {
@@ -154,11 +156,12 @@ router.route('/attendees/id/:attendee_id')
     Attendee.findById(req.params.attendee_id, function(err, attendee) {
       if (err) res.send(err);
 
-      if(req.body.fname || req.body.lname || req.body.email || req.body.location) {
+      if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city) {
         if (req.body.fname) attendee.fname = req.body.fname;
         if (req.body.lname) attendee.lname = req.body.lname;
         if (req.body.email) attendee.email = req.body.email;
-        if (req.body.location) attendee.location = req.body.location;
+        if (req.body.state) attendee.state = req.body.state;
+        if (req.body.city) attendee.city = req.body.city;
 
         // save the updated attendee data
         attendee.save(function(err) {
@@ -314,8 +317,8 @@ function registerUser(attendee, msg) {
     .catch(function(error) { msg.channel.send('Error: '+error) });
 
   // handle locations
-  if (attendee[0].location === 'Ohio') guildUser.addRole('456228521992519700');
-  if (attendee[0].location === 'Illinois') guildUser.addRole('456228742386155520');
+  if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
+  if (attendee[0].state === 'Illinois') guildUser.addRole('456228742386155520');
 
   // welcome user
   msg.channel.send('**Welcome aboard, '+attendee[0].fname+'! Please return to the Hack Chicago server!**');
@@ -341,8 +344,8 @@ function registerUserAgain(attendee, member) {
     .catch(function(error) { console.log('Error: '+error) });
 
   // handle locations
-  if (attendee[0].location === 'Ohio') guildUser.addRole('456228521992519700');
-  if (attendee[0].location === 'Illinois') guildUser.addRole('456228742386155520');
+  if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
+  if (attendee[0].state === 'Illinois') guildUser.addRole('456228742386155520');
 
   // welcome user
   console.log('New user '+attendee[0].fname+' has been successfully onboarded');
