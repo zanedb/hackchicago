@@ -18,7 +18,16 @@ const port = process.env.PORT || 3000;
 const router = express.Router();
 
 app.get('/', function(req, res) {
-  res.status(404).json({ message: '404 not found, please use /api' })
+  res.writeHead(302, {'Location': 'https://hackchicago.io'});
+  return res.end();
+});
+
+app.get('/api', function(req, res) {
+  res.status(404).json({ message: 'Please use /api/v1' });
+});
+
+app.get('/v1', function(req, res) {
+  res.status(404).json({ message: 'Please use /api/v1' });
 });
 
 // middleware to use for all requests
@@ -171,7 +180,7 @@ router.route('/attendees/id/:attendee_id')
   });
 
 // setup Router with Express
-app.use('/api', router);
+app.use('/api/v1', router);
 
 // setup MongoDB
 const mongoose = require('mongoose');
