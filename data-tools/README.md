@@ -17,3 +17,5 @@
     ```
     python data-tools/importer.py -i data-tools/data/attendees.json
     ```
+
+### PLEASE NOTE THAT [`attendees.csv`](https://github.com/zanedb/hackchicago/blob/master/data-tools/data/attendees.csv) CONTAINS SAMPLE DATA
