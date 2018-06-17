@@ -7,6 +7,16 @@ var AttendeeSchema = new Schema({
   email: String,
   state: String,
   city: String,
+  school: String,
+  ref: String,
+  grade: String,
+  timestamp: String,
+  internalNotes: String,
+  note: String,
+  phone: String,
+  shirtSize: String,
+  dietRestrictions: String,
+  gender: String,
   discordId: String,
   hasRegistered: Boolean
 });
