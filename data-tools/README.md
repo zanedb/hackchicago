@@ -19,7 +19,7 @@
 #### 3. [`importer.py`](https://github.com/zanedb/hackchicago/blob/master/data-tools/importer.py): imports a JSON file of attendees into the attendee API
   - Prerequisites:
     - A file called `attendees.json` with at least all Hack Chicago columns located in [`data-tools/data`](https://github.com/zanedb/hackchicago/tree/master/data-tools/data)
-    - A file called `.env` located in [`data-tools`](https://github.com/zanedb/hackchicago/tree/master/data-tools) with the following line, and `key` set to the actual key.
+    - A file called `.env` located in [`data-tools`](https://github.com/zanedb/hackchicago/tree/master/data-tools) with the following line (and filled out values):
       ```
       AUTH_KEY=key
       ```
