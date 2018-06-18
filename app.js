@@ -392,6 +392,7 @@ client.on('guildMemberAdd', member => {
     if (attendee_discord.length == 0) {
       member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
 
+      let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
       let guildUser = guild.member(member.id);
       sendStat('STAT: New attendee <@'+guildUser.user.id+'> JOINED the server. Be ready to assist with verification.')
     } else {
