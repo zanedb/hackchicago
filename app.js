@@ -391,6 +391,9 @@ client.on('guildMemberAdd', member => {
   Attendee.find({ discordId: member.id }, function(err, attendee_discord) {
     if (attendee_discord.length == 0) {
       member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
+
+      let guildUser = guild.member(member.id);
+      sendStat('STAT: New attendee <@'+guildUser.user.id+'> JOINED the server. Be ready to assist with verification.')
     } else {
       registerUserAgain(attendee_discord, member)
     }
