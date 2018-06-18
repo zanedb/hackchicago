@@ -17,6 +17,6 @@
     yarn && yarn start
     ```
 #### 2. [Data Tools](https://github.com/zanedb/hackchicago/blob/master/data-tools/README.md): converts data, uploads it, and manipulates it (i.e. counting referrals)
-  - Please see [the full README]() for more information.
+  - Please see [the full README](https://github.com/zanedb/hackchicago/blob/master/data-tools/README.md) for more information.
 #### 3. **[WIP]** Checkin System: checks in attendees for the event, food, etc.
   - Currently being moved here & updated to use the new API
