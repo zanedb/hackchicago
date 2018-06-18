@@ -344,11 +344,11 @@ function registerUser(attendee, msg) {
   // set user nickname
   guildUser.setNickname(nickname)
     .then(msg.channel.send('Part 1 complete..'))
-    .catch(function(error) { msg.channel.send('Error: '+error) });
+    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting nickname: '+error); });
   // set to "Attendee" role
   guildUser.addRole('455402838210773012')
     .then(msg.channel.send('Part 2 complete..'))
-    .catch(function(error) { msg.channel.send('Error: '+error) });
+    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting role: '+error); });
 
   // handle locations
   if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
@@ -371,11 +371,11 @@ function registerUserAgain(attendee, member) {
   // set user nickname
   guildUser.setNickname(nickname)
     .then(console.log('Nickname set of new user'))
-    .catch(function(error) { console.log('Error: '+error) });
+    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting nickname: '+error); });
   // set to "Attendee" role
   guildUser.addRole('455402838210773012')
     .then(console.log('Role set of new user'))
-    .catch(function(error) { console.log('Error: '+error) });
+    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting role: '+error); });
 
   // handle locations
   if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
