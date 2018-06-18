@@ -1,8 +1,11 @@
 # to run: 
+# make sure there is a .env with AUTH_KEY
 # python data-tools/importer.py -i data-tools/data/attendees.json
 
 import sys, getopt
 import json
+import requests
+import os
 
 # get command line arguments
 def main(argv):
@@ -75,7 +78,11 @@ def read_json(file):
             # remove other unused elements
             element.pop('Internal Tag')
             element.pop('CONFIRMED')
-        print(data)
+
+            # submit data to server (be sure AUTH_KEY is set in .env)
+            auth = os.environ['AUTH_KEY']
+            r = requests.post("https://hackchicago.herokuapp.com/api/v1/attendees", data=element, headers={"Auth":auth})
+            print('Attendee with EMAIL '+element['email']+' status: '+r.text)
 
 # upload JSON file
 def upload_json(json):
