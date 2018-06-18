@@ -253,7 +253,8 @@ client.on('message', (msg) => {
           // if so, check for valid email address
           var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           if (re.test(String(msg.content).toLowerCase())) {
-            Attendee.find({ email: msg.content }, function(err, attendee) {
+            let attendeeEmail = msg.content.toLowerCase();
+            Attendee.find({ email: attendeeEmail }, function(err, attendee) {
               if (err) console.log(err);
 
               // check if DB returns blank data
@@ -263,7 +264,7 @@ client.on('message', (msg) => {
                 // otherwise, ensure the attendee hasn't already registered before continuing
                 if(attendee[0].hasRegistered == false) {
                   // update attendee to be registered (hasRegistered = true)
-                  Attendee.update({ email: msg.content }, { hasRegistered: true, discordId: msg.author.id }, function (err, raw) {
+                  Attendee.update({ email: attendeeEmail }, { hasRegistered: true, discordId: msg.author.id }, function (err, raw) {
                     // if attendee data is saved, register user on server
                     if (raw.ok = 1) {
                       registerUser(attendee, msg);
