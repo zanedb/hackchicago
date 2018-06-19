@@ -16,6 +16,18 @@
     ```
     yarn && yarn start
     ```
+  - Testing:
+    - Please use the following `.env` values for testing the Discord bot & server:
+      ```
+      DISCORD_TOKEN=NDU4NDQwODg0MzMwMTY4MzM0.Dgnr3g.2kzaSfq7E4848w51xIsV3FuZmeY
+      MONGODB_URI=[set up locally and enter URI here]
+      AUTH_KEY=test
+      ```
+    - Use [this link](https://discord.gg/UE8ZMgr) to join the *TESTING* Discord server
+    - To run in testing mode:
+      ```
+      nodemon
+      ```
 #### 2. [Data Tools](https://github.com/zanedb/hackchicago/blob/master/data-tools/README.md): converts data, uploads it, and manipulates it (i.e. counting referrals)
   - Please see [the full README](https://github.com/zanedb/hackchicago/blob/master/data-tools/README.md) for more information.
 #### 3. **[WIP]** Checkin System: checks in attendees for the event, food, etc.
