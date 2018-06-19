@@ -6,6 +6,9 @@ import sys, getopt
 import json
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path='.env')
 
 # get command line arguments
 def main(argv):
@@ -80,13 +83,9 @@ def read_json(file):
             element.pop('CONFIRMED')
 
             # submit data to server (be sure AUTH_KEY is set in .env)
-            auth = os.environ['AUTH_KEY']
+            auth = os.getenv("AUTH_KEY")
             r = requests.post("https://hackchicago.herokuapp.com/api/v1/attendees", data=element, headers={"Auth":auth})
             print('Attendee with EMAIL '+element['email']+' status: '+r.text)
-
-# upload JSON file
-def upload_json(json):
-    print('no')
 
 if __name__ == "__main__":
    main(sys.argv[1:])
