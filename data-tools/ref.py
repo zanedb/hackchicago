@@ -28,15 +28,18 @@ def read_json(file):
     with open(file) as json_data:
         data = json.load(json_data)
         referrals = []
+        referral_total = 0
         for element in data:
             ref = element['REFBY']
             if ref != "":
+                referral_total += 1
                 referrals.append(ref)
         cnt = Counter(referrals)
         # print all referrals, in order from greatest to lowest
         print('All referrals:')
         for ref_person in cnt.most_common():
             print(ref_person)
+        print('Total referrals:\n'+str(referral_total))
 
 if __name__ == "__main__":
    main(sys.argv[1:])
