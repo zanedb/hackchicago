@@ -64,7 +64,6 @@ router.route('/attendees')
         attendee.ref = req.body.ref;
         attendee.grade = req.body.grade;
         attendee.timestamp = req.body.timestamp;
-        attendee.internalNotes = req.body.internalNotes;
         attendee.note = req.body.note;
         attendee.phone = req.body.phone;
         attendee.shirtSize = req.body.shirtSize;
@@ -112,7 +111,7 @@ router.route('/attendees/email/:attendee_email')
     Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
       if (err) res.send(err);
 
-      if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city || req.body.school || req.body.ref || req.body.grade || req.body.timestamp || req.body.internalNotes || req.body.note || req.body.phone || req.body.shirtSize || req.body.dietRestrictions || req.body.gender) {
+      if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city || req.body.school || req.body.ref || req.body.grade || req.body.timestamp || req.body.note || req.body.phone || req.body.shirtSize || req.body.dietRestrictions || req.body.gender) {
         if (req.body.fname) attendee.fname = req.body.fname;
         if (req.body.lname) attendee.lname = req.body.lname;
         if (req.body.email) attendee.email = req.body.email;
@@ -122,7 +121,6 @@ router.route('/attendees/email/:attendee_email')
         if (req.body.ref) attendee.ref = req.body.ref;
         if (req.body.grade) attendee.grade = req.body.grade;
         if (req.body.timestamp) attendee.timestamp = req.body.timestamp;
-        if (req.body.internalNotes) attendee.internalNotes = req.body.internalNotes;
         if (req.body.note) attendee.note = req.body.note;
         if (req.body.phone) attendee.phone = req.body.phone;
         if (req.body.shirtSize) attendee.shirtSize = req.body.shirtSize;
@@ -176,7 +174,7 @@ router.route('/attendees/id/:attendee_id')
     Attendee.findById(req.params.attendee_id, function(err, attendee) {
       if (err) res.send(err);
 
-      if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city || req.body.school || req.body.ref || req.body.grade || req.body.timestamp || req.body.internalNotes || req.body.note || req.body.phone || req.body.shirtSize || req.body.dietRestrictions || req.body.gender) {
+      if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city || req.body.school || req.body.ref || req.body.grade || req.body.timestamp || req.body.note || req.body.phone || req.body.shirtSize || req.body.dietRestrictions || req.body.gender) {
         if (req.body.fname) attendee.fname = req.body.fname;
         if (req.body.lname) attendee.lname = req.body.lname;
         if (req.body.email) attendee.email = req.body.email;
@@ -186,7 +184,6 @@ router.route('/attendees/id/:attendee_id')
         if (req.body.ref) attendee.ref = req.body.ref;
         if (req.body.grade) attendee.grade = req.body.grade;
         if (req.body.timestamp) attendee.timestamp = req.body.timestamp;
-        if (req.body.internalNotes) attendee.internalNotes = req.body.internalNotes;
         if (req.body.note) attendee.note = req.body.note;
         if (req.body.phone) attendee.phone = req.body.phone;
         if (req.body.shirtSize) attendee.shirtSize = req.body.shirtSize;
@@ -214,6 +211,12 @@ router.route('/attendees/id/:attendee_id')
       sendStat('API: Successfully deleted attendee by ID '+req.params.attendee_id);
       res.json({ message: 'Successfully deleted attendee' });
     });
+  });
+
+router.route('/referrals')
+  // accessed at GET http://localhost:8080/api/referrals0
+  .get(function(req, res) {
+    // do stuff
   });
 
 // setup Router with Express
