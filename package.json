@@ -11,6 +11,7 @@
     "npm": "*"
   },
   "dependencies": {
+    "cors": "^2.8.4",
     "discord.js": "^11.3.2",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",

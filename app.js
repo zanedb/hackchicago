@@ -7,11 +7,14 @@ const client = new Discord.Client();
 
 // setup Express server
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 // configure body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+// configure cors
+app.use(cors());
 // set port
 const port = process.env.PORT || 3000;
 // setup router
@@ -32,8 +35,6 @@ app.get('/v1', function(req, res) {
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   // if header "Auth" matches auth variable (from .env)
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..');
@@ -214,7 +215,7 @@ router.route('/attendees/id/:attendee_id')
   });
 
 router.route('/referrals')
-  // accessed at GET http://localhost:8080/api/referrals0
+  // accessed at GET http://localhost:8080/api/referrals 
   .get(function(req, res) {
     // do stuff
   });
