@@ -228,11 +228,12 @@ router.route('/attendees/id/:attendee_id/approve')
           auth: { 
             user: process.env.MAILCHIMP_APPROVAL_USERNAME,
             pass: process.env.MAILCHIMP_APPROVAL_PASSWORD 
-          } 
+          }
         },
         function(err, res, body) {
           if(body.status !== 200) {
             sendStat(`<@&456539994719518750>: ERROR WHILE APPROVING ATTENDEE\n\n\`\`\`${JSON.stringify(body.detail)}\`\`\``);
+            res.status(400).send({ message: body.detail });
           } else {
             attendee.isApproved = true;
 
