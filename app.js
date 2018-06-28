@@ -231,10 +231,11 @@ router.route('/attendees/id/:attendee_id/approve')
           }
         },
         function(error, response, body) {
-          if(body.status !== 200) {
+          console.log(JSON.stringify(body));
+          if(body.status === 400) {
             sendStat(`<@&456539994719518750>: ERROR WHILE APPROVING ATTENDEE\n\n\`\`\`${JSON.stringify(body.detail)}\`\`\``);
             res.status(400).json({ message: body.detail });
-          } else {
+          } else if (body.status == undefined) {
             attendee.isApproved = true;
 
             // save the updated attendee data
