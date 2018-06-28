@@ -18,7 +18,8 @@ var AttendeeSchema = new Schema({
   dietRestrictions: String,
   gender: String,
   discordId: String,
-  hasRegistered: Boolean
+  hasRegistered: Boolean,
+  isApproved: Boolean
 });
 
 module.exports = mongoose.model('Attendee', AttendeeSchema);

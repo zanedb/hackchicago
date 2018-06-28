@@ -1,6 +1,8 @@
 // .env variables
 require('dotenv').config();
 
+const request = require('request');
+
 // setup discord.js
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -71,6 +73,7 @@ router.route('/attendees')
         attendee.dietRestrictions = req.body.dietRestrictions;
         attendee.gender = req.body.gender;
         attendee.hasRegistered = false;
+        attendee.isApproved = false;
 
         // save and check for errors
         attendee.save(function(err, attendee) {
@@ -211,6 +214,40 @@ router.route('/attendees/id/:attendee_id')
 
       sendStat('API: Successfully deleted attendee by ID '+req.params.attendee_id);
       res.json({ message: 'Successfully deleted attendee' });
+    });
+  });
+
+// endpoint to approve attendees
+router.route('/attendees/id/:attendee_id/approve')
+  // accessed at GET http://localhost:3000/api/v1/attendees/id/:attendee_id/approve
+  .post(function(req, res) {
+    Attendee.findById(req.params.attendee_id, function(err, attendee) {
+      request.post(process.env.MAILCHIMP_APPROVAL_URL,
+        { 
+          json: { email_address: attendee.email },
+          auth: { 
+            user: process.env.MAILCHIMP_APPROVAL_USERNAME,
+            pass: process.env.MAILCHIMP_APPROVAL_PASSWORD 
+          } 
+        },
+        function(err, res, body) {
+          if(body.status !== 200) {
+            sendStat(`<@&456539994719518750>: ERROR WHILE APPROVING ATTENDEE\n\n\`\`\`${body.details}\`\`\``);
+          } else {
+            attendee.isApproved = true;
+
+            // save the updated attendee data
+            attendee.save(function(err) {
+              if (err) {
+                res.status(500).send(err);
+              } else {
+                res.status(200).json({ message: 'Attendee approved!' });
+                sendStat(`API: SUCCESS approved attendee with ID ${req.params.attendee_id} and EMAIL ${attendee.email}`);
+              }
+            });
+          }
+        }
+      );
     });
   });
 

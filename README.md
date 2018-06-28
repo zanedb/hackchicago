@@ -11,6 +11,9 @@
       DISCORD_TOKEN=
       MONGODB_URI=
       AUTH_KEY=
+      MAILCHIMP_APPROVAL_URL=
+      MAILCHIMP_APPROVAL_USERNAME=
+      MAILCHIMP_APPROVAL_PASSWORD=
       ```
   - To run:
     ```
