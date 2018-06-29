@@ -231,6 +231,7 @@ router.route('/attendees/id/:attendee_id/approve')
           }
         },
         function(error, response, body) {
+          sendStat(`response: ${JSON.stringify(response)}`);
           sendStat(`response status: ${response.status}`)
           sendStat(JSON.stringify(body));
           sendStat(`body details: ${body.details}`);
