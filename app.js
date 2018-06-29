@@ -231,13 +231,13 @@ router.route('/attendees/id/:attendee_id/approve')
           }
         },
         function(error, response, body) {
-          console.log(JSON.stringify(body));
-          console.log(`body status: ${body.status}`);
-          console.log(`body details: ${body.details}`);
+          sendStat(JSON.stringify(body));
+          sendStat(`body status: ${body.status}`);
+          sendStat(`body details: ${body.details}`);
           if(body.status === 400) {
             sendStat(`<@&456539994719518750>: ERROR WHILE APPROVING ATTENDEE\n\n\`\`\`${body.detail}\`\`\``);
             res.status(400).json({ message: body.detail });
-          } else if (body.status == 200) {
+          } /*else {
             attendee.isApproved = true;
 
             // save the updated attendee data
@@ -249,7 +249,7 @@ router.route('/attendees/id/:attendee_id/approve')
                 sendStat(`API: SUCCESS approved attendee with ID ${req.params.attendee_id} and EMAIL ${attendee.email}`);
               }
             });
-          }
+          }*/
         }
       );
     });
