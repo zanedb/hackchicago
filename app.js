@@ -231,11 +231,7 @@ router.route('/attendees/id/:attendee_id/approve')
           }
         },
         function(error, response, body) {
-          sendStat(`response: ${response.statusCode}`);
-          sendStat(`body: ${JSON.stringify(body)}`);
-          if(body.details !== undefined) sendStat(`body details: ${body.details}`);
-          if(body.status !== undefined) sendStat(`body status: ${body.status}`);
-          if(response.statusCode !== 200) {
+          if(response.statusCode !== 204) {
             sendStat(`<@&456539994719518750>: ERROR WHILE APPROVING ATTENDEE\n\n\`\`\`${body.detail}\`\`\``);
             res.status(400).json({ message: body.detail });
           } else {
