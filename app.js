@@ -232,7 +232,7 @@ router.route('/attendees/id/:attendee_id/approve')
         },
         function(error, response, body) {
           if(response.statusCode !== 204) {
-            sendStat(`<@&456539994719518750>: ERROR WHILE APPROVING ATTENDEE\n\n\`\`\`${body.detail}\`\`\``);
+            sendStat(`Error while approving attendee:\n\n\`\`\`${body.detail}\`\`\``);
             res.status(400).json({ message: body.detail });
           } else {
             attendee.isApproved = true;
