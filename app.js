@@ -231,9 +231,8 @@ router.route('/attendees/id/:attendee_id/approve')
           }
         },
         function(error, response, body) {
-          sendStat(`response: ${JSON.stringify(response)}`);
-          sendStat(`response status: ${response.status}`)
-          sendStat(JSON.stringify(body));
+          sendStat(`response: ${response.statusCode}`);
+          sendStat(`body: ${body}`);
           sendStat(`body details: ${body.details}`);
           sendStat(`body status: ${body.status}`);
           if(response.status === 400) {
