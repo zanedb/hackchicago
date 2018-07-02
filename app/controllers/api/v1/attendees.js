@@ -1,6 +1,6 @@
 const express = require('express');
 const request = require('request');
-const Attendee = require('../../models/attendee');
+const Attendee = require('../../../models/attendee');
 const router = express.Router();
 
 router.route('/')
