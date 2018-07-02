@@ -81,7 +81,7 @@ router.route('/attendees')
           if(err) res.send(err);
 
           res.json({ message: 'Attendee created!' });
-          sendStat('API: SUCCESS created attendee with EMAIL ' + req.body.email + ', ID ' + attendee.id);
+          sendStat(`API: SUCCESS created attendee with EMAIL ${req.body.email}, ID ${attendee.id}`);
         });
       }
       else {
@@ -139,7 +139,7 @@ router.route('/attendees/email/:attendee_email')
           if(err) res.send(err);
 
           res.json({ message: 'Attendee updated!' });
-          sendStat('API: SUCCESS updated attendee by EMAIL ' + req.params.attendee_email);
+          sendStat(`API: SUCCESS updated attendee by EMAIL ${req.params.attendee_email}`);
         });
       }
       else {
@@ -161,7 +161,7 @@ router.route('/attendees/email/:attendee_email')
           }
           else {
             res.json({ message: 'Successfully deleted attendee' });
-            sendStat('API: SUCCESS deleted attendee by EMAIL ' + req.params.attendee_email + ', ID ' + attendee[0].id);
+            sendStat(`API: SUCCESS deleted attendee by EMAIL ${req.params.attendee_email}, ID ${attendee[0].id}`);
           }
         });
       }
@@ -205,7 +205,7 @@ router.route('/attendees/id/:attendee_id')
           if(err) res.send(err);
 
           res.json({ message: 'Attendee updated!' });
-          sendStat('API: SUCCESS updated attendee with ID ' + req.params.attendee_id);
+          sendStat(`API: SUCCESS updated attendee with ID ${req.params.attendee_id}`);
         });
       }
       else {
@@ -219,7 +219,7 @@ router.route('/attendees/id/:attendee_id')
     }, (err, attendee) => {
       if(err) res.send(err);
 
-      sendStat('API: Successfully deleted attendee by ID ' + req.params.attendee_id);
+      sendStat(`API: Successfully deleted attendee by ID ${req.params.attendee_id}`);
       res.json({ message: 'Successfully deleted attendee' });
     });
   });
@@ -330,7 +330,7 @@ client.on('ready', () => {
 
 // handle system error
 process.on('uncaughtException', ex => {
-  sendStat('<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n```' + ex + '```');
+  sendStat(`<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``);
 });
 
 // on discord message
@@ -365,17 +365,17 @@ client.on('message', (msg) => {
                     }
                     else {
                       msg.channel.send('An error occurred, **organizers have been notified.**');
-                      sendStat('<@&456539994719518750>: ERROR: Attendee with ID ' + attendee[0].id + ' and EMAIL ' + attendee[0].email + ' could NOT update hasRegistered (true) or discordId (' + id + ').')
+                      sendStat(`<@&456539994719518750>: ERROR: Attendee with ID ${attendee[0].id} and EMAIL ${attendee[0].email} could NOT update hasRegistered (true) or discordId (${id}).`)
                     }
                   });
                 }
                 else if(attendee[0].hasRegistered == null) {
                   msg.channel.send('An error occurred when fetching your attendee data. **Organizers have been notified.**')
-                  sendStat('<@&456539994719518750>: ERROR: Attendee ' + attendee[0].id + ' (' + attendee[0].email + ') has invalid "hasRegistered" state.'); // mention the @Dev role
+                  sendStat(`<@&456539994719518750>: ERROR: Attendee ${attendee[0].id} (${attendee[0].email}) has invalid "hasRegistered" state.`); // mention the @Dev role
                 }
                 else {
                   msg.channel.send('You have already registered. **Please contact an organizer for help.**');
-                  sendStat('WARN: Attendee ' + attendee[0].id + ' (' + attendee[0].email + ') is attempting to re-register.');
+                  sendStat(`WARN: Attendee ${attendee[0].id} (${attendee[0].email}) is attempting to re-register.`);
                 }
               }
             });
@@ -430,7 +430,7 @@ function sendStat(message) {
   let orgChannel = guild.channels.get('456541536658784266'); // #stat channel ID
 
   orgChannel.send(message);
-  console.log('stat: ' + message);
+  console.log(`stat: ${message}`);
 }
 
 function registerUser(attendee, msg) {
@@ -440,24 +440,28 @@ function registerUser(attendee, msg) {
   let guildUser = guild.member(id)
 
   // setup nickname to be real name (example: John D.)
-  let nickname = attendee[0].fname + ' ' + (attendee[0].lname).charAt(0) + '.';
+  let nickname = `${attendee[0].fname} ${(attendee[0].lname).charAt(0)}.`;
   // set user nickname
   guildUser.setNickname(nickname)
     .then(msg.channel.send('Part 1 complete..'))
-    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@' + guildUser.user.id + '> with EMAIL ' + attendee[0].email + ' while setting nickname: ' + error); });
+    .catch(err => {
+      sendStat(`<@&456539994719518750>: Error with attendee <@${guildUser.user.id}> with EMAIL ${attendee[0].email} while setting nickname: ${err}`);
+    });
   // set to "Attendee" role
   guildUser.addRole('455402838210773012')
     .then(msg.channel.send('Part 2 complete..'))
-    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@' + guildUser.user.id + '> with EMAIL ' + attendee[0].email + ' while setting role: ' + error); });
+    .catch(err => {
+      sendStat(`<@&456539994719518750>: Error with attendee <@${guildUser.user.id}> with EMAIL ${attendee[0].email} while setting role: ${err}`);
+    });
 
   // handle locations
   if(attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
   if(attendee[0].state === 'Illinois') guildUser.addRole('456228742386155520');
 
   // welcome user
-  msg.channel.send('**Welcome aboard, ' + attendee[0].fname + '! Please return to the Hack Chicago server!**');
+  msg.channel.send(`**Welcome aboard, ${attendee[0].fname}! Please return to the Hack Chicago server!**`);
   // inform organizers
-  sendStat('STAT: Attendee <@' + guildUser.user.id + '> with ID ' + attendee[0].id + ' and EMAIL ' + attendee[0].email + ' has just BEEN VERIFIED!');
+  sendStat(`STAT: Attendee <@${guildUser.user.id}> with ID ${attendee[0].id} and EMAIL ${attendee[0].email} has just BEEN VERIFIED!`);
 }
 
 function registerUserAgain(attendee, member) {
@@ -467,24 +471,27 @@ function registerUserAgain(attendee, member) {
   let guildUser = guild.member(id)
 
   // setup nickname to be real name (example: John D.)
-  let nickname = attendee[0].fname + ' ' + (attendee[0].lname).charAt(0) + '.';
+  let nickname = `${attendee[0].fname} ${(attendee[0].lname).charAt(0)}.`;
   // set user nickname
   guildUser.setNickname(nickname)
     .then(console.log('Nickname set of new user'))
-    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@' + guildUser.user.id + '> with EMAIL ' + attendee[0].email + ' while setting nickname: ' + error); });
+    .catch(err => {
+      sendStat(`<@&456539994719518750>: Error with attendee <@${guildUser.user.id}> with EMAIL ${attendee[0].email} while setting nickname: ${err}`);
+    });
   // set to "Attendee" role
   guildUser.addRole('455402838210773012')
     .then(console.log('Role set of new user'))
-    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@' + guildUser.user.id + '> with EMAIL ' + attendee[0].email + ' while setting role: ' + error); });
-
+    .catch(err => {
+      sendStat(`<@&456539994719518750>: Error with attendee <@${guildUser.user.id}> with EMAIL ${attendee[0].email} while setting role: ${err}`);
+    });
   // handle locations
   if(attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
   if(attendee[0].state === 'Illinois') guildUser.addRole('456228742386155520');
 
   // welcome user
-  console.log('New user ' + attendee[0].fname + ' has been successfully onboarded');
+  console.log(`New user ${attendee[0].fname} has been successfully onboarded`);
   // inform organizers
-  sendStat('STAT: REJOINING Attendee <@' + guildUser.user.id + '> with ID ' + attendee[0].id + ' and EMAIL ' + attendee[0].email + ' has just BEEN RE-VERIFIED!');
+  sendStat(`STAT: REJOINING Attendee <@${guildUser.user.id}> with ID ${attendee[0].id} and EMAIL ${attendee[0].email} has just BEEN RE-VERIFIED!`);
 }
 
 client.on('guildMemberAdd', member => {
@@ -494,7 +501,7 @@ client.on('guildMemberAdd', member => {
 
       let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
       let guildUser = guild.member(member.id);
-      sendStat('STAT: New attendee <@' + guildUser.user.id + '> JOINED the server. Be ready to assist with verification.')
+      sendStat(`STAT: New attendee <@${guildUser.user.id}> JOINED the server. Be ready to assist with verification.`);
     }
     else {
       registerUserAgain(attendee_discord, member)
@@ -505,5 +512,6 @@ client.on('guildMemberAdd', member => {
 // login to bot using token in .env
 client.login(process.env.DISCORD_TOKEN);
 // start Express server
-app.listen(port);
-console.log('Express server is running on port ' + port)
+app.listen(port, () => {
+  console.log(`Express server is running on port ${port}`);
+});
