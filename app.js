@@ -105,7 +105,7 @@ router.route('/attendees/email/:attendee_email')
       if(err) res.send(err);
 
       if(attendee.length == 0) {
-        res.status(400).json({ message: 'Invalid email' })
+        res.status(400).json({ message: 'Invalid email' });
       }
       else {
         res.json(attendee);
@@ -270,7 +270,7 @@ router.route('/projects')
         project.name = req.body.name;
         // TODO: require email to be logged in email
         // TODO: add login system
-        project.submitter = { email: req.body.email, id: req.body.id }
+        project.submitter = { email: req.body.email, id: req.body.id };
         project.tagline = req.body.tagline;
         project.description = req.body.description;
         project.timestamp = `${new Date().getMonth()+1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
@@ -370,7 +370,7 @@ client.on('message', (msg) => {
                   });
                 }
                 else if(attendee[0].hasRegistered == null) {
-                  msg.channel.send('An error occurred when fetching your attendee data. **Organizers have been notified.**')
+                  msg.channel.send('An error occurred when fetching your attendee data. **Organizers have been notified.**');
                   sendStat(`<@&456539994719518750>: ERROR: Attendee ${attendee[0].id} (${attendee[0].email}) has invalid "hasRegistered" state.`); // mention the @Dev role
                 }
                 else {
@@ -399,7 +399,7 @@ client.on('message', (msg) => {
       if(msg.content == '!about') msg.channel.send('**Hi, I\'m Orpheus. I\'m Hack Club & Hack Chicago\'s Robot Dinosaur!** Here are a few links about me:\n\n- My Origin Story: https://hackclub.com/workshops/orpheus\n- More Pictures of Me: https://github.com/hackclub/dinosaurs\n- Hack Club (my creators): https://hackclub.com');
 
       // !help
-      if(msg.content == '!help') msg.channel.send('**Hi, I\'m Orpheus, the official Hack Chicago Dino! I can: **\n- Show you the full list of commands: `!commands`\n- Point you to <#456267567095611392> for mentor help\n- Point you to <#456267748658380812> for staff help\n- List our organizers: `!organizers`\n- Inform you of Hack Chicago rules: `!rules`')
+      if(msg.content == '!help') msg.channel.send('**Hi, I\'m Orpheus, the official Hack Chicago Dino! I can: **\n- Show you the full list of commands: `!commands`\n- Point you to <#456267567095611392> for mentor help\n- Point you to <#456267748658380812> for staff help\n- List our organizers: `!organizers`\n- Inform you of Hack Chicago rules: `!rules`');
 
       // !commands
       if(msg.content == '!commands') msg.channel.send('**Commands:**\n- `!about`: Learn more about me :robot: \n- `!help`: Get help from me :raised_back_of_hand: \n- `!commands`: This one! :point_up_2: \n- `!rules`: List the rules :straight_ruler: \n- `!organizers`: List all organizers :bust_in_silhouette:\n- `!website`: Learn about our website :computer: \n- `!social`: Check out our social media :chart_with_upwards_trend: \n- `!sponsors`: View our lovely sponsors :blush: ');
@@ -435,9 +435,9 @@ function sendStat(message) {
 
 function registerUser(attendee, msg) {
   // locate user
-  let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  let guild = client.guilds.get('455396418199486465'); // hack chicago server (shouldn't be hardcoded but oh well..)
   let id = msg.author.id;
-  let guildUser = guild.member(id)
+  let guildUser = guild.member(id);
 
   // setup nickname to be real name (example: John D.)
   let nickname = `${attendee[0].fname} ${(attendee[0].lname).charAt(0)}.`;
@@ -466,9 +466,9 @@ function registerUser(attendee, msg) {
 
 function registerUserAgain(attendee, member) {
   // locate user
-  let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  let guild = client.guilds.get('455396418199486465'); // hack chicago server (shouldn't be hardcoded but oh well..)
   let id = member.id;
-  let guildUser = guild.member(id)
+  let guildUser = guild.member(id);
 
   // setup nickname to be real name (example: John D.)
   let nickname = `${attendee[0].fname} ${(attendee[0].lname).charAt(0)}.`;
@@ -499,12 +499,12 @@ client.on('guildMemberAdd', member => {
     if(attendee_discord.length == 0) {
       member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
 
-      let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+      let guild = client.guilds.get('455396418199486465'); // hack chicago server (shouldn't be hardcoded but oh well..)
       let guildUser = guild.member(member.id);
       sendStat(`STAT: New attendee <@${guildUser.user.id}> JOINED the server. Be ready to assist with verification.`);
     }
     else {
-      registerUserAgain(attendee_discord, member)
+      registerUserAgain(attendee_discord, member);
     }
   });
 });
