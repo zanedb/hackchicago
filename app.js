@@ -22,21 +22,21 @@ const port = process.env.PORT || 3000;
 // setup router
 const router = express.Router();
 
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
   res.writeHead(302, {'Location': 'https://hackchicago.io'});
   return res.end();
 });
 
-app.get('/api', function(req, res) {
+app.get('/api', (req, res) => {
   res.status(404).json({ message: 'Please use /api/v1' });
 });
 
-app.get('/v1', function(req, res) {
+app.get('/v1', (req, res) => {
   res.status(404).json({ message: 'Please use /api/v1' });
 });
 
 // middleware to use for all requests
-router.use(function(req, res, next) {
+router.use((req, res, next) => {
   // if header "Auth" matches auth variable (from .env)
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..');
@@ -47,14 +47,14 @@ router.use(function(req, res, next) {
 });
 
 // accessed at http://localhost:3000/api/v1
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
   res.json({ message: 'API loaded successfully' });
 });
 
 router.route('/attendees')
   // create an attendee (accessed at POST http://localhost:3000/api/v1/attendees)
-  .post(function(req, res) {
-    Attendee.find({ email: req.body.email }, function(err, attendee) {
+  .post((req, res) => {
+    Attendee.find({ email: req.body.email }, (err, attendee) => {
       if (attendee.length == 0) {
         let attendee = new Attendee();
         // set params from request
@@ -76,7 +76,7 @@ router.route('/attendees')
         attendee.isApproved = false;
 
         // save and check for errors
-        attendee.save(function(err, attendee) {
+        attendee.save((err, attendee) => {
           if (err) res.send(err);
 
           res.json({ message: 'Attendee created!' });
@@ -87,8 +87,8 @@ router.route('/attendees')
       }
     });
   })
-  .get(function(req, res) {
-    Attendee.find(function(err, attendees) {
+  .get((req, res) => {
+    Attendee.find((err, attendees) => {
       if (err) res.send(err);
 
       res.json(attendees);
@@ -98,8 +98,8 @@ router.route('/attendees')
 // get/update/delete attendees by email
 router.route('/attendees/email/:attendee_email')
   // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/email/:attendee_email)
-  .get(function(req, res) {
-    Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+  .get((req, res) => {
+    Attendee.find({ email: req.params.attendee_email }, (err, attendee) => {
       if (err) res.send(err);
 
       if (attendee.length == 0) {
@@ -110,9 +110,9 @@ router.route('/attendees/email/:attendee_email')
     });
   })
   // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/email/:attendee_email)
-  .put(function(req, res) {
+  .put((req, res) => {
     // find & update attendee
-    Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+    Attendee.find({ email: req.params.attendee_email }, (err, attendee) => {
       if (err) res.send(err);
 
       if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city || req.body.school || req.body.ref || req.body.grade || req.body.timestamp || req.body.note || req.body.phone || req.body.shirtSize || req.body.dietRestrictions || req.body.gender) {
@@ -132,7 +132,7 @@ router.route('/attendees/email/:attendee_email')
         if (req.body.gender) attendee.gender = req.body.gender;
 
         // save the updated attendee data
-        attendee.save(function(err) {
+        attendee.save(err => {
           if (err) res.send(err);
 
           res.json({ message: 'Attendee updated!' });
@@ -143,14 +143,14 @@ router.route('/attendees/email/:attendee_email')
       }
     });
   })
-  .delete(function(req, res) {
-    Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
+  .delete((req, res) => {
+    Attendee.find({ email: req.params.attendee_email }, (err, attendee) => {
       if (attendee.length == 0) {
         res.status(400).json({ message: 'Invalid attendee' });
       } else {
         Attendee.remove({
           email: req.params.attendee_email
-        }, function(err, deleted_attendee) {
+        }, (err, deleted_attendee) => {
           if (err) {
             res.send(err);
           } else {
@@ -165,17 +165,17 @@ router.route('/attendees/email/:attendee_email')
 // get/update/delete attendees by ID
 router.route('/attendees/id/:attendee_id')
   // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/id/:attendee_id)
-  .get(function(req, res) {
-    Attendee.findById(req.params.attendee_id, function(err, attendee) {
+  .get((req, res) => {
+    Attendee.findById(req.params.attendee_id, (err, attendee) => {
       if (err) res.send(err);
 
       res.json(attendee);
     });
   })
   // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/id/:attendee_id)
-  .put(function(req, res) {
+  .put((req, res) => {
     // find & update attendee
-    Attendee.findById(req.params.attendee_id, function(err, attendee) {
+    Attendee.findById(req.params.attendee_id, (err, attendee) => {
       if (err) res.send(err);
 
       if(req.body.fname || req.body.lname || req.body.email || req.body.state || req.body.city || req.body.school || req.body.ref || req.body.grade || req.body.timestamp || req.body.note || req.body.phone || req.body.shirtSize || req.body.dietRestrictions || req.body.gender) {
@@ -195,7 +195,7 @@ router.route('/attendees/id/:attendee_id')
         if (req.body.gender) attendee.gender = req.body.gender;
 
         // save the updated attendee data
-        attendee.save(function(err) {
+        attendee.save(err => {
           if (err) res.send(err);
 
           res.json({ message: 'Attendee updated!' });
@@ -206,10 +206,10 @@ router.route('/attendees/id/:attendee_id')
       }
     });
   })
-  .delete(function(req, res) {
+  .delete((req, res) => {
     Attendee.remove({
       _id: req.params.attendee_id
-    }, function(err, attendee) {
+    }, (err, attendee) => {
       if (err) res.send(err);
 
       sendStat('API: Successfully deleted attendee by ID '+req.params.attendee_id);
@@ -220,8 +220,8 @@ router.route('/attendees/id/:attendee_id')
 // endpoint to approve attendees
 router.route('/attendees/id/:attendee_id/approve')
   // accessed at GET http://localhost:3000/api/v1/attendees/id/:attendee_id/approve
-  .post(function(req, res) {
-    Attendee.findById(req.params.attendee_id, function(err, attendee) {
+  .post((req, res) => {
+    Attendee.findById(req.params.attendee_id, (err, attendee) => {
       request.post(process.env.MAILCHIMP_APPROVAL_URL,
         { 
           json: { email_address: attendee.email },
@@ -230,7 +230,7 @@ router.route('/attendees/id/:attendee_id/approve')
             pass: process.env.MAILCHIMP_APPROVAL_PASSWORD 
           }
         },
-        function(error, response, body) {
+        (error, response, body) => {
           if(response.statusCode !== 204) {
             sendStat(`Error while approving attendee:\n\n\`\`\`${body.detail}\`\`\``);
             res.status(400).json({ message: body.detail });
@@ -238,7 +238,7 @@ router.route('/attendees/id/:attendee_id/approve')
             attendee.isApproved = true;
 
             // save the updated attendee data
-            attendee.save(function(err) {
+            attendee.save(err => {
               if (error) {
                 res.status(500).send(err);
               } else {
@@ -254,8 +254,8 @@ router.route('/attendees/id/:attendee_id/approve')
 
 router.route('/projects')
   // create a project (accessed at POST http://localhost:3000/api/v1/projects)
-  .post(function(req, res) {
-    Project.find({ name: req.body.name }, function(err, projectResult) {
+  .post((req, res) => {
+    Project.find({ name: req.body.name }, (err, projectResult) => {
       if (projectResult.length == 0) {
         let project = new Project();
         // set params from request
@@ -268,7 +268,7 @@ router.route('/projects')
         project.timestamp = `${new Date().getMonth()+1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
 
         // save and check for errors
-        project.save(function(err, project) {
+        project.save((err, project) => {
           if (err) {
             res.send(err);
           } else {
@@ -281,8 +281,8 @@ router.route('/projects')
       }
     });
   })
-  .get(function(req, res) {
-    Project.find(function(err, projects) {
+  .get((req, res) => {
+    Project.find((err, projects) => {
       if (err) {
         res.send(err);
       } else {
@@ -293,7 +293,7 @@ router.route('/projects')
 
 router.route('/referrals')
   // accessed at GET http://localhost:3000/api/v1/referrals 
-  .get(function(req, res) {
+  .get((req, res) => {
     // do stuff
   });
 
@@ -318,7 +318,7 @@ client.on('ready', () => {
 });
 
 // handle system error
-process.on('uncaughtException', function(ex) {
+process.on('uncaughtException', ex => {
   sendStat('<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n```'+ex+'```');
 });
 
@@ -329,14 +329,14 @@ client.on('message', (msg) => {
     // check if message is in DM
     if (msg.guild == null) {
       // check if Discord user has already been authenticated
-      Attendee.find({ discordId: msg.author.id }, function(err, attendee_discord) {
+      Attendee.find({ discordId: msg.author.id }, (err, attendee_discord) => {
         // if account hasn't been authed, allow auth
         if (attendee_discord.length == 0) {
           // if so, check for valid email address
           var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           if (re.test(String(msg.content).toLowerCase())) {
             let attendeeEmail = msg.content.toLowerCase();
-            Attendee.find({ email: attendeeEmail }, function(err, attendee) {
+            Attendee.find({ email: attendeeEmail }, (err, attendee) => {
               if (err) console.log(err);
 
               // check if DB returns blank data
@@ -426,11 +426,11 @@ function registerUser(attendee, msg) {
   // set user nickname
   guildUser.setNickname(nickname)
     .then(msg.channel.send('Part 1 complete..'))
-    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting nickname: '+error); });
+    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting nickname: '+error); });
   // set to "Attendee" role
   guildUser.addRole('455402838210773012')
     .then(msg.channel.send('Part 2 complete..'))
-    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting role: '+error); });
+    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting role: '+error); });
 
   // handle locations
   if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
@@ -453,11 +453,11 @@ function registerUserAgain(attendee, member) {
   // set user nickname
   guildUser.setNickname(nickname)
     .then(console.log('Nickname set of new user'))
-    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting nickname: '+error); });
+    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting nickname: '+error); });
   // set to "Attendee" role
   guildUser.addRole('455402838210773012')
     .then(console.log('Role set of new user'))
-    .catch(function(error) { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting role: '+error); });
+    .catch((error) => { sendStat('<@&456539994719518750>: Error with attendee <@'+guildUser.user.id+'> with EMAIL '+attendee[0].email+' while setting role: '+error); });
 
   // handle locations
   if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700');
@@ -470,7 +470,7 @@ function registerUserAgain(attendee, member) {
 }
 
 client.on('guildMemberAdd', member => {
-  Attendee.find({ discordId: member.id }, function(err, attendee_discord) {
+  Attendee.find({ discordId: member.id }, (err, attendee_discord) => {
     if (attendee_discord.length == 0) {
       member.send("Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee.");
 
