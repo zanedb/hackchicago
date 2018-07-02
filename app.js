@@ -69,7 +69,7 @@ process.on('uncaughtException', ex => {
 });
 
 // on discord message
-client.on('message', (msg) => {
+client.on('message', msg => {
   // make sure Orpheus doesn't react to her own message
   if(msg.author !== client.user) {
     // check if message is in DM
