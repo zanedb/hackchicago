@@ -46,13 +46,13 @@ router.use(function(req, res, next) {
   }
 });
 
-// accessed at http://localhost:3000/api
+// accessed at http://localhost:3000/api/v1
 router.get('/', function(req, res) {
   res.json({ message: 'API loaded successfully' });
 });
 
 router.route('/attendees')
-  // create an attendee (accessed at POST http://localhost:3000/api/attendees)
+  // create an attendee (accessed at POST http://localhost:3000/api/v1/attendees)
   .post(function(req, res) {
     Attendee.find({ email: req.body.email }, function(err, attendee) {
       if (attendee.length == 0) {
@@ -97,7 +97,7 @@ router.route('/attendees')
 
 // get/update/delete attendees by email
 router.route('/attendees/email/:attendee_email')
-  // get the attendee with that id (accessed at GET http://localhost:8080/api/attendees/email/:attendee_email)
+  // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/email/:attendee_email)
   .get(function(req, res) {
     Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
       if (err) res.send(err);
@@ -109,7 +109,7 @@ router.route('/attendees/email/:attendee_email')
       }
     });
   })
-  // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/email/:attendee_email)
+  // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/email/:attendee_email)
   .put(function(req, res) {
     // find & update attendee
     Attendee.find({ email: req.params.attendee_email }, function(err, attendee) {
@@ -164,7 +164,7 @@ router.route('/attendees/email/:attendee_email')
 
 // get/update/delete attendees by ID
 router.route('/attendees/id/:attendee_id')
-  // get the attendee with that id (accessed at GET http://localhost:8080/api/attendees/id/:attendee_id)
+  // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/id/:attendee_id)
   .get(function(req, res) {
     Attendee.findById(req.params.attendee_id, function(err, attendee) {
       if (err) res.send(err);
@@ -172,7 +172,7 @@ router.route('/attendees/id/:attendee_id')
       res.json(attendee);
     });
   })
-  // update the attendee with this id (accessed at PUT http://localhost:8080/api/attendees/id/:attendee_id)
+  // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/id/:attendee_id)
   .put(function(req, res) {
     // find & update attendee
     Attendee.findById(req.params.attendee_id, function(err, attendee) {
@@ -252,8 +252,47 @@ router.route('/attendees/id/:attendee_id/approve')
     });
   });
 
+router.route('/projects')
+  // create a project (accessed at POST http://localhost:3000/api/v1/projects)
+  .post(function(req, res) {
+    Project.find({ name: req.body.name }, function(err, projectResult) {
+      if (projectResult.length == 0) {
+        let project = new Project();
+        // set params from request
+        project.name = req.body.name;
+        // TODO: require email to be logged in email
+        // TODO: add login system
+        project.submitter = { email: req.body.email, id: req.body.id }
+        project.tagline = req.body.tagline;
+        project.description = req.body.description;
+        project.timestamp = `${new Date().getMonth()+1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
+
+        // save and check for errors
+        project.save(function(err, project) {
+          if (err) {
+            res.send(err);
+          } else {
+            res.json({ message: 'Project created!' });
+            sendStat(`API: SUCCESS created PROJECT with NAME ${req.body.name}, by EMAIL ${project.submitter.email}`);
+          }
+        });
+      } else {
+        res.status(400).json({ message: 'Project with that name already exists' });
+      }
+    });
+  })
+  .get(function(req, res) {
+    Project.find(function(err, projects) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.status(200).json(projects);
+      }
+    });
+  });
+
 router.route('/referrals')
-  // accessed at GET http://localhost:8080/api/referrals 
+  // accessed at GET http://localhost:3000/api/v1/referrals 
   .get(function(req, res) {
     // do stuff
   });
@@ -264,15 +303,16 @@ app.use('/api/v1', router);
 // setup MongoDB
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI);
-// load in attendee model
+// load in models
 const Attendee = require('./app/models/attendee');
+const Project = require('./app/models/project');
 
 // setup discord bot on load
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   let game = '!help for help';
   client.user.setActivity(game, { type: 'PLAYING' })
-    .then(console.log('Running game: '+game))
+    .then(console.log(`Running game: ${game}`))
     .catch(console.error);
   sendStat('<@&456539994719518750>: Bot is live!');
 });
