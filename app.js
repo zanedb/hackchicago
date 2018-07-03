@@ -82,7 +82,7 @@ client.on('message', msg => {
         if (attendee_discord.length == 0) {
           // if so, check for valid email address
           const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          if (emailRegex.test(String(msg.content).toLowerCase())) {
+          if (emailRegex.test(msg.content.toLowerCase())) {
             const attendeeEmail = msg.content.toLowerCase()
             Attendee.find({ email: attendeeEmail }, (err, attendee) => {
               if (err) console.log(err)
@@ -97,7 +97,7 @@ client.on('message', msg => {
                   Attendee.update(
                     { email: attendeeEmail },
                     { hasRegistered: true, discordId: msg.author.id },
-                    function(err, raw) {
+                    (err, raw) => {
                       // if attendee data is saved, register user on server
                       if ((raw.ok = 1)) {
                         registerUser(attendee, msg)
@@ -226,7 +226,7 @@ function registerUser(attendee, msg) {
   const guildUser = guild.member(id)
 
   // setup nickname to be real name (example: John D.)
-  const nickname = `${attendee[0].fname} ${attendee[0].lname.charAt(0)}.`
+  const nickname = `${attendee[0].fname} ${attendee[0].lname[0]}.`
   // set user nickname
   guildUser
     .setNickname(nickname)
@@ -275,7 +275,7 @@ function registerUserAgain(attendee, member) {
   const guildUser = guild.member(id)
 
   // setup nickname to be real name (example: John D.)
-  const nickname = `${attendee[0].fname} ${attendee[0].lname.charAt(0)}.`
+  const nickname = `${attendee[0].fname} ${attendee[0].lname[0]}.`
   // set user nickname
   guildUser
     .setNickname(nickname)
