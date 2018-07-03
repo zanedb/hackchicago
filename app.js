@@ -55,7 +55,7 @@ const Attendee = require('./app/models/attendee')
 // setup discord bot on load
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
-  let game = '!help for help'
+  const game = '!help for help'
   client.user
     .setActivity(game, { type: 'PLAYING' })
     .then(console.log(`Running game: ${game}`))
@@ -83,7 +83,7 @@ client.on('message', msg => {
           // if so, check for valid email address
           var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
           if (re.test(String(msg.content).toLowerCase())) {
-            let attendeeEmail = msg.content.toLowerCase()
+            const attendeeEmail = msg.content.toLowerCase()
             Attendee.find({ email: attendeeEmail }, (err, attendee) => {
               if (err) console.log(err)
 
@@ -212,8 +212,8 @@ client.on('message', msg => {
 })
 
 function sendStat(message) {
-  let guild = client.guilds.get('455396418199486465') // hack chicago server ID
-  let orgChannel = guild.channels.get('456541536658784266') // #stat channel ID
+  const guild = client.guilds.get('455396418199486465') // hack chicago server ID
+  const orgChannel = guild.channels.get('456541536658784266') // #stat channel ID
 
   orgChannel.send(message)
   console.log(`stat: ${message}`)
@@ -221,12 +221,12 @@ function sendStat(message) {
 
 function registerUser(attendee, msg) {
   // locate user
-  let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
-  let id = msg.author.id
-  let guildUser = guild.member(id)
+  const guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  const id = msg.author.id
+  const guildUser = guild.member(id)
 
   // setup nickname to be real name (example: John D.)
-  let nickname = `${attendee[0].fname} ${attendee[0].lname.charAt(0)}.`
+  const nickname = `${attendee[0].fname} ${attendee[0].lname.charAt(0)}.`
   // set user nickname
   guildUser
     .setNickname(nickname)
@@ -270,12 +270,12 @@ function registerUser(attendee, msg) {
 
 function registerUserAgain(attendee, member) {
   // locate user
-  let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
-  let id = member.id
-  let guildUser = guild.member(id)
+  const guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  const id = member.id
+  const guildUser = guild.member(id)
 
   // setup nickname to be real name (example: John D.)
-  let nickname = `${attendee[0].fname} ${attendee[0].lname.charAt(0)}.`
+  const nickname = `${attendee[0].fname} ${attendee[0].lname.charAt(0)}.`
   // set user nickname
   guildUser
     .setNickname(nickname)
@@ -319,8 +319,8 @@ client.on('guildMemberAdd', member => {
         "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
       )
 
-      let guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
-      let guildUser = guild.member(member.id)
+      const guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+      const guildUser = guild.member(member.id)
       sendStat(
         `STAT: New attendee <@${
           guildUser.user.id

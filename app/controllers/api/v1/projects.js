@@ -17,7 +17,7 @@ router
   .post((req, res) => {
     Project.find({ name: req.body.name }, (err, projectResult) => {
       if (projectResult.length == 0) {
-        let project = new Project()
+        const project = new Project()
         // set params from request
         project.name = req.body.name
         // TODO: require email to be logged in email

@@ -16,7 +16,7 @@ router
   .post((req, res) => {
     Attendee.find({ email: req.body.email }, (err, attendee) => {
       if (attendee.length == 0) {
-        let attendee = new Attendee()
+        const attendee = new Attendee()
         // set params from request
         attendee.fname = req.body.fname
         attendee.lname = req.body.lname
