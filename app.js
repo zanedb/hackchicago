@@ -35,7 +35,7 @@ app.use('/api/v1/referrals', require('./app/controllers/api/v1/referrals'))
 
 mongoose.connect(process.env.MONGODB_URI)
 
-// setup discord bot on load
+// Set up Discord bot
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`)
   const game = '!help for help'
@@ -69,24 +69,23 @@ client.on('guildMemberAdd', member => {
 })
 
 client.on('message', msg => {
-  // make sure Orpheus doesn't react to her own message
+  // Make sure Orpheus doesn't respond to her own message
   if (msg.author === client.user) {
     return
   }
-  // check if message is in DM
+  // Check if message is in DM
   if (!msg.guild) {
-    // check if Discord user has already been authenticated
+    // Check if Discord user has already been authenticated
     Attendee.findOne({ discordId: msg.author.id }, (err, attendee_discord) => {
-      // if account hasn't been authed, allow auth
+      // If account hasn't been authed, allow auth
       if (!attendee_discord) {
-        // if so, check for valid email address
+        // Check for valid email address
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         if (emailRegex.test(msg.content.toLowerCase())) {
           const attendeeEmail = msg.content.toLowerCase()
           Attendee.findOne({ email: attendeeEmail }, (err, attendee) => {
             if (err) console.log(err)
 
-            // check if DB returns blank data
             if (!attendee) {
               msg.channel.send('**You are not an attendee.**')
             } else {
@@ -124,7 +123,7 @@ client.on('message', msg => {
                   `<@&${discord.role.dev}>: ERROR: Attendee ${attendee.id} (${
                     attendee.email
                   }) has invalid "hasRegistered" state.`
-                ) // mention the @Dev role
+                )
               } else {
                 msg.channel.send(
                   'You have already registered. **Please contact an organizer for help.**'
@@ -143,15 +142,15 @@ client.on('message', msg => {
           )
         }
       } else {
-        // discord account is already registered, orpheus should _not_ respond to messages
+        // discord account is already registered
         //msg.channel.send('This Discord account is already registered.');
       }
     })
   } else {
-    // IS IN SERVER, SEND COMMANDS
+    // User is in server, handle commands
     if (msg.content == 'ping') msg.channel.send('pong')
 
-    // Checks if first character is command prefix
+    // Check if first character is the command prefix
     const firstChar = msg.content[0]
     if (firstChar !== '!') {
       return
@@ -182,14 +181,14 @@ function sendStat(message) {
 }
 
 async function registerUser(attendee, msg) {
-  // locate user
+  // Locate user
   const guild = client.guilds.get(discord.server)
   const id = msg.author.id
   const guildUser = guild.member(id)
 
-  // setup nickname to be real name (example: John D.)
+  // Setup nickname to be real name (example: John D.)
   const nickname = `${attendee.fname} ${attendee.lname[0]}.`
-  // set user nickname
+  // Set user nickname
   try {
     await guildUser.setNickname(nickname)
     msg.channel.send('Part 1 complete..')
@@ -200,7 +199,7 @@ async function registerUser(attendee, msg) {
       }> with EMAIL ${attendee.email} while setting nickname: ${e}`
     )
   }
-  // set to "Attendee" role
+  // Set to "Attendee" role
   try {
     await guildUser.addRole(discord.role.attendee)
     msg.channel.send('Part 2 complete..')
@@ -212,17 +211,17 @@ async function registerUser(attendee, msg) {
     )
   }
 
-  // handle locations
+  // Handle locations
   if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
   if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
-  // welcome user
+  // Welcome user
   msg.channel.send(
     `**Welcome aboard, ${
       attendee.fname
     }! Please return to the Hack Chicago server!**`
   )
-  // inform organizers
+  // Inform organizers
   sendStat(
     `STAT: Attendee <@&${guildUser.user.id}> with ID ${attendee.id} and EMAIL ${
       attendee.email
@@ -231,14 +230,14 @@ async function registerUser(attendee, msg) {
 }
 
 async function registerUserAgain(attendee, member) {
-  // locate user
+  // Locate user
   const guild = client.guilds.get(discord.server)
   const id = member.id
   const guildUser = guild.member(id)
 
-  // setup nickname to be real name (example: John D.)
+  // Setup nickname to be real name (example: John D.)
   const nickname = `${attendee.fname} ${attendee.lname[0]}.`
-  // set user nickname
+  // Set user nickname
   try {
     await guildUser.setNickname(nickname)
     console.log('Nickname set of new user')
@@ -249,7 +248,7 @@ async function registerUserAgain(attendee, member) {
       }> with EMAIL ${attendee.email} while setting nickname: ${e}`
     )
   }
-  // set to "Attendee" role
+  // Set to "Attendee" role
   try {
     await guildUser.addRole(discord.role.attendee)
     console.log('Role set of new user')
@@ -261,13 +260,13 @@ async function registerUserAgain(attendee, member) {
     )
   }
 
-  // handle locations
+  // Handle locations
   if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
   if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
-  // welcome user
+  // Welcome user
   console.log(`New user ${attendee.fname} has been successfully onboarded`)
-  // inform organizers
+  // Inform organizers
   sendStat(
     `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
       attendee.id

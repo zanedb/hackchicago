@@ -3,9 +3,9 @@ const router = express.Router()
 
 router
   .route('/')
-  // accessed at GET http://localhost:3000/api/v1/referrals
+  // Accessed at GET /api/v1/referrals
   .get((req, res) => {
-    // do stuff
+    // TODO
   })
 
 module.exports = router

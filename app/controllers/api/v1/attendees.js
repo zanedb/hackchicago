@@ -12,12 +12,11 @@ router
       res.json(attendees)
     })
   })
-  // create an attendee (accessed at POST http://localhost:3000/api/v1/attendees)
+  // Create an attendee (accessed at POST /api/v1/attendees)
   .post((req, res) => {
     Attendee.findOne({ email: req.body.email }, (err, attendee) => {
       if (!attendee) {
         const attendee = new Attendee()
-        // set params from request
         attendee.fname = req.body.fname
         attendee.lname = req.body.lname
         attendee.email = req.body.email
@@ -35,7 +34,6 @@ router
         attendee.hasRegistered = false
         attendee.isApproved = false
 
-        // save and check for errors
         attendee.save((err, attendee) => {
           if (err) res.send(err)
 
@@ -57,7 +55,7 @@ router
 // get/update/delete attendees by email
 router
   .route('/email/:attendee_email')
-  // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/email/:attendee_email)
+  // Get the attendee with that id (accessed at GET /api/v1/attendees/email/:attendee_email)
   .get((req, res) => {
     Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
       if (err) res.send(err)
@@ -69,9 +67,8 @@ router
       }
     })
   })
-  // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/email/:attendee_email)
+  // Update the attendee with this id (accessed at PUT /api/v1/attendees/email/:attendee_email)
   .put((req, res) => {
-    // find & update attendee
     Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
       if (err) res.send(err)
 
@@ -107,7 +104,6 @@ router
           attendee.dietRestrictions = req.body.dietRestrictions
         if (req.body.gender) attendee.gender = req.body.gender
 
-        // save the updated attendee data
         attendee.save(err => {
           if (err) res.send(err)
 
@@ -152,7 +148,7 @@ router
 // get/update/delete attendees by ID
 router
   .route('/id/:attendee_id')
-  // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/id/:attendee_id)
+  // Get the attendee with that id (accessed at GET /api/v1/attendees/id/:attendee_id)
   .get((req, res) => {
     Attendee.findById(req.params.attendee_id, (err, attendee) => {
       if (err) res.send(err)
@@ -160,9 +156,8 @@ router
       res.json(attendee)
     })
   })
-  // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/id/:attendee_id)
+  // Update the attendee with this id (accessed at PUT /api/v1/attendees/id/:attendee_id)
   .put((req, res) => {
-    // find & update attendee
     Attendee.findById(req.params.attendee_id, (err, attendee) => {
       if (err) res.send(err)
 
@@ -198,7 +193,6 @@ router
           attendee.dietRestrictions = req.body.dietRestrictions
         if (req.body.gender) attendee.gender = req.body.gender
 
-        // save the updated attendee data
         attendee.save(err => {
           if (err) res.send(err)
 
@@ -228,10 +222,10 @@ router
     )
   })
 
-// endpoint to approve attendees
+// Endpoint to approve attendees
 router
   .route('/id/:attendee_id/approve')
-  // accessed at GET http://localhost:3000/api/v1/attendees/id/:attendee_id/approve
+  // Accessed at GET /api/v1/attendees/id/:attendee_id/approve
   .post((req, res) => {
     Attendee.findById(req.params.attendee_id, (err, attendee) => {
       request.post(
@@ -251,8 +245,6 @@ router
             res.status(400).json({ message: body.detail })
           } else {
             attendee.isApproved = true
-
-            // save the updated attendee data
             attendee.save(err => {
               if (error) {
                 res.status(500).send(err)

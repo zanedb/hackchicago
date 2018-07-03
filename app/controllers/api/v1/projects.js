@@ -13,22 +13,20 @@ router
       }
     })
   })
-  // create a project (accessed at POST http://localhost:3000/api/v1/projects)
+  // Create a project (accessed at POST /api/v1/projects)
   .post((req, res) => {
     Project.findOne({ name: req.body.name }, (err, projectResult) => {
       if (!projectResult) {
         const project = new Project()
-        // set params from request
         project.name = req.body.name
-        // TODO: require email to be logged in email
-        // TODO: add login system
+        // TODO: Require email to be logged in email
+        // TODO: Add login system
         project.submitter = { email: req.body.email, id: req.body.id }
         project.tagline = req.body.tagline
         project.description = req.body.description
         project.timestamp = `${new Date().getMonth() +
           1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
 
-        // save and check for errors
         project.save((err, project) => {
           if (err) {
             res.send(err)
