@@ -16,14 +16,12 @@ app.use(cors())
 
 const port = process.env.PORT || 3000
 
-const router = express.Router()
-
 app.get('/', (req, res) => {
   res.writeHead(302, { Location: 'https://hackchicago.io' })
   return res.end()
 })
 
-router.use((req, res, next) => {
+app.use('/api/v1/*', (req, res, next) => {
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
     next()
@@ -31,11 +29,6 @@ router.use((req, res, next) => {
     res.status(403).json({ message: 'Please authenticate.' })
   }
 })
-
-router.get('/', (req, res) => {
-  res.json({ message: 'API loaded successfully' })
-})
-
 app.use('/api/v1/attendees', require('./app/controllers/api/v1/attendees'))
 app.use('/api/v1/projects', require('./app/controllers/api/v1/projects'))
 app.use('/api/v1/referrals', require('./app/controllers/api/v1/referrals'))
