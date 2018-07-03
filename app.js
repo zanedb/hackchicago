@@ -1,23 +1,18 @@
-// .env variables
 require('dotenv').config()
 
-// setup discord.js
 const Discord = require('discord.js')
 const client = new Discord.Client()
 
-// setup Express server
 const express = require('express')
 const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
-// configure body-parser
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-// configure cors
 app.use(cors())
-// set port
+
 const port = process.env.PORT || 3000
-// setup router
+
 const router = express.Router()
 
 app.get('/', (req, res) => {
@@ -25,31 +20,26 @@ app.get('/', (req, res) => {
   return res.end()
 })
 
-// middleware to use for all requests
 router.use((req, res, next) => {
-  // if header "Auth" matches auth variable (from .env)
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
-    next() // make sure we go to the next route and don't stop here
+    next()
   } else {
     res.status(403).json({ message: 'Please authenticate.' })
   }
 })
 
-// accessed at http://localhost:3000/api/v1
 router.get('/', (req, res) => {
   res.json({ message: 'API loaded successfully' })
 })
 
-// setup Router with Express
 app.use('/api/v1/attendees', require('./app/controllers/api/v1/attendees'))
 app.use('/api/v1/projects', require('./app/controllers/api/v1/projects'))
 app.use('/api/v1/referrals', require('./app/controllers/api/v1/referrals'))
 
-// setup MongoDB
 const mongoose = require('mongoose')
 mongoose.connect(process.env.MONGODB_URI)
-// load in models
+
 const Attendee = require('./app/models/attendee')
 
 // setup discord bot on load
@@ -63,14 +53,12 @@ client.on('ready', () => {
   sendStat('<@&456539994719518750>: Bot is live!')
 })
 
-// handle system error
 process.on('uncaughtException', ex => {
   sendStat(
     `<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
   )
 })
 
-// on discord message
 client.on('message', msg => {
   // make sure Orpheus doesn't react to her own message
   if (msg.author !== client.user) {
@@ -148,7 +136,6 @@ client.on('message', msg => {
       })
     } else {
       // IS IN SERVER, SEND COMMANDS
-      // ping pong
       if (msg.content == 'ping') msg.channel.send('pong')
 
       // Checks if first character is command prefix
@@ -332,9 +319,8 @@ client.on('guildMemberAdd', member => {
   })
 })
 
-// login to bot using token in .env
 client.login(process.env.DISCORD_TOKEN)
-// start Express server
+
 app.listen(port, () => {
   console.log(`Express server is running on port ${port}`)
 })
