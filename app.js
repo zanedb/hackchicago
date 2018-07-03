@@ -7,6 +7,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Attendee = require('./app/models/attendee')
 const commands = require('./config/commands')
+const discord = require('./config/discord')
 const client = new Discord.Client()
 const app = express()
 
@@ -43,12 +44,12 @@ client.on('ready', () => {
     .setActivity(game, { type: 'PLAYING' })
     .then(console.log(`Running game: ${game}`))
     .catch(console.error)
-  sendStat('<@&456539994719518750>: Bot is live!')
+  sendStat(`@&${discord.role.dev}>: Bot is live!`)
 })
 
 process.on('uncaughtException', ex => {
   sendStat(
-    `<@&456539994719518750>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
+    `<@&${discord.role.dev}>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
   )
 })
 
@@ -87,7 +88,7 @@ client.on('message', msg => {
                           'An error occurred, **organizers have been notified.**'
                         )
                         sendStat(
-                          `<@&456539994719518750>: ERROR: Attendee with ID ${
+                          `<@&${discord.role.dev}>: ERROR: Attendee with ID ${
                             attendee[0].id
                           } and EMAIL ${
                             attendee[0].email
@@ -101,7 +102,7 @@ client.on('message', msg => {
                     'An error occurred when fetching your attendee data. **Organizers have been notified.**'
                   )
                   sendStat(
-                    `<@&456539994719518750>: ERROR: Attendee ${
+                    `<@&${discord.role.dev}>: ERROR: Attendee ${
                       attendee[0].id
                     } (${attendee[0].email}) has invalid "hasRegistered" state.`
                   ) // mention the @Dev role
@@ -147,8 +148,8 @@ client.on('message', msg => {
 })
 
 function sendStat(message) {
-  const guild = client.guilds.get('455396418199486465') // hack chicago server ID
-  const orgChannel = guild.channels.get('456541536658784266') // #stat channel ID
+  const guild = client.guilds.get(discord.server)
+  const orgChannel = guild.channels.get(discord.channel.stat)
 
   orgChannel.send(message)
   console.log(`stat: ${message}`)
@@ -156,7 +157,7 @@ function sendStat(message) {
 
 function registerUser(attendee, msg) {
   // locate user
-  const guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  const guild = client.guilds.get(discord.server)
   const id = msg.author.id
   const guildUser = guild.member(id)
 
@@ -168,26 +169,26 @@ function registerUser(attendee, msg) {
     .then(msg.channel.send('Part 1 complete..'))
     .catch(err => {
       sendStat(
-        `<@&456539994719518750>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@${
           guildUser.user.id
         }> with EMAIL ${attendee[0].email} while setting nickname: ${err}`
       )
     })
   // set to "Attendee" role
   guildUser
-    .addRole('455402838210773012')
+    .addRole(discord.role.attendee)
     .then(msg.channel.send('Part 2 complete..'))
     .catch(err => {
       sendStat(
-        `<@&456539994719518750>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@${
           guildUser.user.id
         }> with EMAIL ${attendee[0].email} while setting role: ${err}`
       )
     })
 
   // handle locations
-  if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700')
-  if (attendee[0].state === 'Illinois') guildUser.addRole('456228742386155520')
+  if (attendee[0].state === 'Ohio') guildUser.addRole(discord.role.ohio)
+  if (attendee[0].state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
   // welcome user
   msg.channel.send(
@@ -205,7 +206,7 @@ function registerUser(attendee, msg) {
 
 function registerUserAgain(attendee, member) {
   // locate user
-  const guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+  const guild = client.guilds.get(discord.server)
   const id = member.id
   const guildUser = guild.member(id)
 
@@ -217,14 +218,14 @@ function registerUserAgain(attendee, member) {
     .then(console.log('Nickname set of new user'))
     .catch(err => {
       sendStat(
-        `<@&456539994719518750>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@${
           guildUser.user.id
         }> with EMAIL ${attendee[0].email} while setting nickname: ${err}`
       )
     })
   // set to "Attendee" role
   guildUser
-    .addRole('455402838210773012')
+    .addRole(discord.role.attendee)
     .then(console.log('Role set of new user'))
     .catch(err => {
       sendStat(
@@ -234,8 +235,8 @@ function registerUserAgain(attendee, member) {
       )
     })
   // handle locations
-  if (attendee[0].state === 'Ohio') guildUser.addRole('456228521992519700')
-  if (attendee[0].state === 'Illinois') guildUser.addRole('456228742386155520')
+  if (attendee[0].state === 'Ohio') guildUser.addRole(discord.role.ohio)
+  if (attendee[0].state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
   // welcome user
   console.log(`New user ${attendee[0].fname} has been successfully onboarded`)
@@ -254,7 +255,7 @@ client.on('guildMemberAdd', member => {
         "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
       )
 
-      const guild = client.guilds.get('455396418199486465') // hack chicago server (shouldn't be hardcoded but oh well..)
+      const guild = client.guilds.get(discord.server)
       const guildUser = guild.member(member.id)
       sendStat(
         `STAT: New attendee <@${
