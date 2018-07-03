@@ -170,7 +170,7 @@ function registerUser(attendee, msg) {
     .then(msg.channel.send('Part 1 complete..'))
     .catch(err => {
       sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@&${
           guildUser.user.id
         }> with EMAIL ${attendee.email} while setting nickname: ${err}`
       )
@@ -181,7 +181,7 @@ function registerUser(attendee, msg) {
     .then(msg.channel.send('Part 2 complete..'))
     .catch(err => {
       sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@&${
           guildUser.user.id
         }> with EMAIL ${attendee.email} while setting role: ${err}`
       )
@@ -199,7 +199,7 @@ function registerUser(attendee, msg) {
   )
   // inform organizers
   sendStat(
-    `STAT: Attendee <@${guildUser.user.id}> with ID ${
+    `STAT: Attendee <@&${guildUser.user.id}> with ID ${
       attendee.id
     } and EMAIL ${attendee.email} has just BEEN VERIFIED!`
   )
@@ -219,7 +219,7 @@ function registerUserAgain(attendee, member) {
     .then(console.log('Nickname set of new user'))
     .catch(err => {
       sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@&${
           guildUser.user.id
         }> with EMAIL ${attendee.email} while setting nickname: ${err}`
       )
@@ -230,7 +230,7 @@ function registerUserAgain(attendee, member) {
     .then(console.log('Role set of new user'))
     .catch(err => {
       sendStat(
-        `<@&456539994719518750>: Error with attendee <@${
+        `<@&${discord.role.dev}>: Error with attendee <@&${
           guildUser.user.id
         }> with EMAIL ${attendee.email} while setting role: ${err}`
       )
@@ -243,7 +243,7 @@ function registerUserAgain(attendee, member) {
   console.log(`New user ${attendee.fname} has been successfully onboarded`)
   // inform organizers
   sendStat(
-    `STAT: REJOINING Attendee <@${guildUser.user.id}> with ID ${
+    `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
       attendee.id
     } and EMAIL ${attendee.email} has just BEEN RE-VERIFIED!`
   )
@@ -259,7 +259,7 @@ client.on('guildMemberAdd', member => {
       const guild = client.guilds.get(discord.server)
       const guildUser = guild.member(member.id)
       sendStat(
-        `STAT: New attendee <@${
+        `STAT: New attendee <@&${
           guildUser.user.id
         }> JOINED the server. Be ready to assist with verification.`
       )
