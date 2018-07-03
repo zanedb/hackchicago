@@ -1,16 +1,17 @@
 require('dotenv').config()
 
-const commands = require('./config/commands')
-
-const Discord = require('discord.js')
-const client = new Discord.Client()
-
-const express = require('express')
-const cors = require('cors')
-const app = express()
 const bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({ extended: true }))
+const Discord = require('discord.js')
+const cors = require('cors')
+const express = require('express')
+const mongoose = require('mongoose')
+const Attendee = require('./app/models/attendee')
+const commands = require('./config/commands')
+const client = new Discord.Client()
+const app = express()
+
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 
 const port = process.env.PORT || 3000
@@ -39,10 +40,7 @@ app.use('/api/v1/attendees', require('./app/controllers/api/v1/attendees'))
 app.use('/api/v1/projects', require('./app/controllers/api/v1/projects'))
 app.use('/api/v1/referrals', require('./app/controllers/api/v1/referrals'))
 
-const mongoose = require('mongoose')
 mongoose.connect(process.env.MONGODB_URI)
-
-const Attendee = require('./app/models/attendee')
 
 // setup discord bot on load
 client.on('ready', () => {
