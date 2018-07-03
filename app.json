@@ -1,5 +1,5 @@
 {
-  "name": "discord",
+  "name": "hackchicago-api",
   "buildpacks": [
     {
       "url": "https://github.com/heroku/heroku-buildpack-nodejs"
