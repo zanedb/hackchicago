@@ -46,10 +46,24 @@ client.on('ready', () => {
   sendStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
-process.on('uncaughtException', ex => {
-  sendStat(
-    `<@&${discord.role.dev}>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
-  )
+client.on('guildMemberAdd', member => {
+  Attendee.findOne({ discordId: member.id }, (err, attendee_discord) => {
+    if (!attendee_discord) {
+      member.send(
+        "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
+      )
+
+      const guild = client.guilds.get(discord.server)
+      const guildUser = guild.member(member.id)
+      sendStat(
+        `STAT: New attendee <@&${
+          guildUser.user.id
+        }> JOINED the server. Be ready to assist with verification.`
+      )
+    } else {
+      registerUserAgain(attendee_discord, member)
+    }
+  })
 })
 
 client.on('message', msg => {
@@ -145,6 +159,12 @@ client.on('message', msg => {
       msg.channel.send("That command doesn't exist!")
     }
   }
+})
+
+process.on('uncaughtException', ex => {
+  sendStat(
+    `<@&${discord.role.dev}>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
+  )
 })
 
 function sendStat(message) {
@@ -247,26 +267,6 @@ function registerUserAgain(attendee, member) {
     } and EMAIL ${attendee.email} has just BEEN RE-VERIFIED!`
   )
 }
-
-client.on('guildMemberAdd', member => {
-  Attendee.findOne({ discordId: member.id }, (err, attendee_discord) => {
-    if (!attendee_discord) {
-      member.send(
-        "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
-      )
-
-      const guild = client.guilds.get(discord.server)
-      const guildUser = guild.member(member.id)
-      sendStat(
-        `STAT: New attendee <@&${
-          guildUser.user.id
-        }> JOINED the server. Be ready to assist with verification.`
-      )
-    } else {
-      registerUserAgain(attendee_discord, member)
-    }
-  })
-})
 
 client.login(process.env.DISCORD_TOKEN)
 
