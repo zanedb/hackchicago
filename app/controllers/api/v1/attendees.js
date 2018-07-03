@@ -14,8 +14,8 @@ router
   })
   // create an attendee (accessed at POST http://localhost:3000/api/v1/attendees)
   .post((req, res) => {
-    Attendee.find({ email: req.body.email }, (err, attendee) => {
-      if (attendee.length == 0) {
+    Attendee.findOne({ email: req.body.email }, (err, attendee) => {
+      if (!attendee) {
         const attendee = new Attendee()
         // set params from request
         attendee.fname = req.body.fname
@@ -59,10 +59,10 @@ router
   .route('/email/:attendee_email')
   // get the attendee with that id (accessed at GET http://localhost:3000/api/v1/attendees/email/:attendee_email)
   .get((req, res) => {
-    Attendee.find({ email: req.params.attendee_email }, (err, attendee) => {
+    Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
       if (err) res.send(err)
 
-      if (attendee.length == 0) {
+      if (!attendee) {
         res.status(400).json({ message: 'Invalid email' })
       } else {
         res.json(attendee)
@@ -72,7 +72,7 @@ router
   // update the attendee with this id (accessed at PUT http://localhost:3000/api/v1/attendees/email/:attendee_email)
   .put((req, res) => {
     // find & update attendee
-    Attendee.find({ email: req.params.attendee_email }, (err, attendee) => {
+    Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
       if (err) res.send(err)
 
       if (
@@ -124,8 +124,8 @@ router
     })
   })
   .delete((req, res) => {
-    Attendee.find({ email: req.params.attendee_email }, (err, attendee) => {
-      if (attendee.length == 0) {
+    Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
+      if (!attendee) {
         res.status(400).json({ message: 'Invalid attendee' })
       } else {
         Attendee.remove(
@@ -140,7 +140,7 @@ router
               sendStat(
                 `API: SUCCESS deleted attendee by EMAIL ${
                   req.params.attendee_email
-                }, ID ${attendee[0].id}`
+                }, ID ${attendee.id}`
               )
             }
           }

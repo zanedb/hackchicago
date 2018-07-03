@@ -15,8 +15,8 @@ router
   })
   // create a project (accessed at POST http://localhost:3000/api/v1/projects)
   .post((req, res) => {
-    Project.find({ name: req.body.name }, (err, projectResult) => {
-      if (projectResult.length == 0) {
+    Project.findOne({ name: req.body.name }, (err, projectResult) => {
+      if (!projectResult) {
         const project = new Project()
         // set params from request
         project.name = req.body.name
