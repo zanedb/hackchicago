@@ -81,8 +81,8 @@ client.on('message', msg => {
         // if account hasn't been authed, allow auth
         if (attendee_discord.length == 0) {
           // if so, check for valid email address
-          var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          if (re.test(String(msg.content).toLowerCase())) {
+          const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          if (emailRegex.test(String(msg.content).toLowerCase())) {
             const attendeeEmail = msg.content.toLowerCase()
             Attendee.find({ email: attendeeEmail }, (err, attendee) => {
               if (err) console.log(err)
