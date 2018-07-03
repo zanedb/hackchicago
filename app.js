@@ -82,7 +82,7 @@ client.on('message', msg => {
                   { hasRegistered: true, discordId: msg.author.id },
                   (err, raw) => {
                     // if attendee data is saved, register user on server
-                    if ((raw.ok = 1)) {
+                    if (raw.ok) {
                       registerUser(attendee, msg)
                     } else {
                       msg.channel.send(
