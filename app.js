@@ -18,8 +18,7 @@ app.use(cors())
 const port = process.env.PORT || 3000
 
 app.get('/', (req, res) => {
-  res.writeHead(302, { Location: 'https://hackchicago.io' })
-  return res.end()
+  res.redirect(302, 'https://hackchicago.io')
 })
 
 app.use('/api/v1/*', (req, res, next) => {
