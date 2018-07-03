@@ -1,0 +1,80 @@
+const discord = require('./discord')
+
+module.exports = {
+  about: `
+    **Hi, I'm Orpheus. I'm Hack Club & Hack Chicago's Robot Dinosaur!** Here are a few links about me:
+
+    - My Origin Story: https://hackclub.com/workshops/orpheus
+    - More Pictures of Me: https://github.com/hackclub/dinosaurs
+    - Hack Club (my creators): https://hackclub.com
+  `,
+  commands: `
+    **Commands:**
+    - \`!about\`: Learn more about me :robot:
+    - \`!help\`: Get help from me :raised_back_of_hand:
+    - \`!commands\`: This one! :point_up_2:
+    - \`!rules\`: List the rules :straight_ruler:
+    - \`!organizers\`: List all organizers :bust_in_silhouette:
+    - \`!website\`: Learn about our website :computer:
+    - \`!social\`: Check out our social media :chart_with_upwards_trend:
+    - \`!sponsors\`: View our lovely sponsors :blush:
+  `,
+  help: `
+    **Hi, I'm Orpheus, the official Hack Chicago Dino! I can:**
+    - Show you the full list of commands: \`!commands\`
+    - Point you to <#${discord.channel['mentor-help']}> for mentor help
+    - Point you to <#${discord.channel['staff-help']}> for staff help
+    - List our organizers: \`!organizers\`
+    - Inform you of Hack Chicago rules: \`!rules\`
+  `,
+  organizers: `
+    **Organizers:**
+    - Amy C.: Marketing Team
+    - Annie W.: Design Team
+    - Ava S.: Marketing Team
+    - Bhargav Y.: Finance Team
+    - Megan C.: Operations Lead
+    - Michael P.: Logistics Team
+    - Mingjie J.: Marketing Lead
+    - Musa K.: Marketing Team
+    - Sean K.: Logistics Team
+    - Victor T.: Tech Team
+    - Yev B.: Tech Team
+    - Zane D.: Tech Lead
+
+    **And of course, our beloved Orpheus!**
+  `,
+  rules: `
+    **Rules:**
+    You must adhere to both the Hack Club & MLH Code of Conducts.
+
+    - Hack Club Code of Conduct: https://conduct.hackclub.com/
+    - MLH Code of Conduct: https://github.com/MLH/mlh-policies/blob/master/code-of-conduct.md
+  `,
+  social: `
+    **Check us out below:**
+
+    - Twitter: https://twitter.com/hackchicago18
+    - Instagram: https://www.instagram.com/hackchicago
+    - Facebook: https://facebook.com/hackchicago
+
+    **Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/
+  `,
+  sponsors: `
+    **We'd like to thank our amazing sponsors!**
+
+    - McDonalds: https://www.mcdonalds.com
+    - Paylocity: https://www.paylocity.com
+    - Balsamiq: https://balsamiq.com
+    - Flexera: https://www.flexera.com
+    - Neighborhoods.com: https://www.neighborhoods.com
+    - Repl.it: https://repl.it
+    - Belvedere Trading: https://www.belvederetrading.com
+    - Civis Analytics: https://new.civisanalytics.com
+    - Tastytrade: https://www.tastytrade.com/tt/
+    - Tastyworks: https://tastyworks.com/
+  `,
+  stayawake: 'No.',
+  website: 'Check out our **website** at https://hackchicago.io/.' /* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/,
+  '': "No command specified!"
+}
