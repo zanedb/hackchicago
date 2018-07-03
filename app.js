@@ -44,7 +44,7 @@ client.on('ready', () => {
     .setActivity(game, { type: 'PLAYING' })
     .then(console.log(`Running game: ${game}`))
     .catch(console.error)
-  sendStat(`<@${discord.role.dev}>: Bot is live!`)
+  sendStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
 process.on('uncaughtException', ex => {
