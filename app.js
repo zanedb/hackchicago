@@ -93,7 +93,7 @@ client.on('message', msg => {
                           attendee.id
                         } and EMAIL ${
                           attendee.email
-                        } could NOT update hasRegistered (true) or discordId (${id}).`
+                        } could NOT update hasRegistered (true) or discordId (${attendee.discordId}).`
                       )
                     }
                   }
