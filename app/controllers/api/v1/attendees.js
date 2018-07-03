@@ -2,6 +2,7 @@ const express = require('express')
 const request = require('request')
 const Attendee = require('../../../models/attendee')
 const router = express.Router()
+const { sendStat } = require('../../../../app')
 
 router
   .route('/')

@@ -272,3 +272,5 @@ client.login(process.env.DISCORD_TOKEN)
 app.listen(port, () => {
   console.log(`Express server is running on port ${port}`)
 })
+
+module.exports.sendStat = sendStat
