@@ -36,18 +36,20 @@ app.use('/api/v1/referrals', require('./app/controllers/api/v1/referrals'))
 mongoose.connect(process.env.MONGODB_URI)
 
 // setup discord bot on load
-client.on('ready', () => {
+client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`)
   const game = '!help for help'
-  client.user
-    .setActivity(game, { type: 'PLAYING' })
-    .then(console.log(`Running game: ${game}`))
-    .catch(console.error)
+  try {
+    await client.user.setActivity(game, { type: 'PLAYING' })
+    console.log(`Running game: ${game}`)
+  } catch (e) {
+    console.error(e)
+  }
   sendStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
 client.on('guildMemberAdd', member => {
-  Attendee.findOne({ discordId: member.id }, (err, attendee_discord) => {
+  Attendee.findOne({ discordId: member.id }, async (err, attendee_discord) => {
     if (!attendee_discord) {
       member.send(
         "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
@@ -61,7 +63,7 @@ client.on('guildMemberAdd', member => {
         }> JOINED the server. Be ready to assist with verification.`
       )
     } else {
-      registerUserAgain(attendee_discord, member)
+      await registerUserAgain(attendee_discord, member)
     }
   })
 })
@@ -94,10 +96,10 @@ client.on('message', msg => {
                 Attendee.update(
                   { email: attendeeEmail },
                   { hasRegistered: true, discordId: msg.author.id },
-                  (err, raw) => {
+                  async (err, raw) => {
                     // if attendee data is saved, register user on server
                     if (raw.ok) {
-                      registerUser(attendee, msg)
+                      await registerUser(attendee, msg)
                     } else {
                       msg.channel.send(
                         'An error occurred, **organizers have been notified.**'
@@ -107,7 +109,9 @@ client.on('message', msg => {
                           attendee.id
                         } and EMAIL ${
                           attendee.email
-                        } could NOT update hasRegistered (true) or discordId (${attendee.discordId}).`
+                        } could NOT update hasRegistered (true) or discordId (${
+                          attendee.discordId
+                        }).`
                       )
                     }
                   }
@@ -117,9 +121,9 @@ client.on('message', msg => {
                   'An error occurred when fetching your attendee data. **Organizers have been notified.**'
                 )
                 sendStat(
-                  `<@&${discord.role.dev}>: ERROR: Attendee ${
-                    attendee.id
-                  } (${attendee.email}) has invalid "hasRegistered" state.`
+                  `<@&${discord.role.dev}>: ERROR: Attendee ${attendee.id} (${
+                    attendee.email
+                  }) has invalid "hasRegistered" state.`
                 ) // mention the @Dev role
               } else {
                 msg.channel.send(
@@ -163,7 +167,9 @@ client.on('message', msg => {
 
 process.on('uncaughtException', ex => {
   sendStat(
-    `<@&${discord.role.dev}>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
+    `<@&${
+      discord.role.dev
+    }>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
   )
 })
 
@@ -175,7 +181,7 @@ function sendStat(message) {
   console.log(`stat: ${message}`)
 }
 
-function registerUser(attendee, msg) {
+async function registerUser(attendee, msg) {
   // locate user
   const guild = client.guilds.get(discord.server)
   const id = msg.author.id
@@ -184,27 +190,27 @@ function registerUser(attendee, msg) {
   // setup nickname to be real name (example: John D.)
   const nickname = `${attendee.fname} ${attendee.lname[0]}.`
   // set user nickname
-  guildUser
-    .setNickname(nickname)
-    .then(msg.channel.send('Part 1 complete..'))
-    .catch(err => {
-      sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@&${
-          guildUser.user.id
-        }> with EMAIL ${attendee.email} while setting nickname: ${err}`
-      )
-    })
+  try {
+    await guildUser.setNickname(nickname)
+    msg.channel.send('Part 1 complete..')
+  } catch (e) {
+    sendStat(
+      `<@&${discord.role.dev}>: Error with attendee <@&${
+        guildUser.user.id
+      }> with EMAIL ${attendee.email} while setting nickname: ${e}`
+    )
+  }
   // set to "Attendee" role
-  guildUser
-    .addRole(discord.role.attendee)
-    .then(msg.channel.send('Part 2 complete..'))
-    .catch(err => {
-      sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@&${
-          guildUser.user.id
-        }> with EMAIL ${attendee.email} while setting role: ${err}`
-      )
-    })
+  try {
+    await guildUser.addRole(discord.role.attendee)
+    msg.channel.send('Part 2 complete..')
+  } catch (e) {
+    sendStat(
+      `<@&${discord.role.dev}>: Error with attendee <@&${
+        guildUser.user.id
+      }> with EMAIL ${attendee.email} while setting role: ${e}`
+    )
+  }
 
   // handle locations
   if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
@@ -218,13 +224,13 @@ function registerUser(attendee, msg) {
   )
   // inform organizers
   sendStat(
-    `STAT: Attendee <@&${guildUser.user.id}> with ID ${
-      attendee.id
-    } and EMAIL ${attendee.email} has just BEEN VERIFIED!`
+    `STAT: Attendee <@&${guildUser.user.id}> with ID ${attendee.id} and EMAIL ${
+      attendee.email
+    } has just BEEN VERIFIED!`
   )
 }
 
-function registerUserAgain(attendee, member) {
+async function registerUserAgain(attendee, member) {
   // locate user
   const guild = client.guilds.get(discord.server)
   const id = member.id
@@ -233,27 +239,28 @@ function registerUserAgain(attendee, member) {
   // setup nickname to be real name (example: John D.)
   const nickname = `${attendee.fname} ${attendee.lname[0]}.`
   // set user nickname
-  guildUser
-    .setNickname(nickname)
-    .then(console.log('Nickname set of new user'))
-    .catch(err => {
-      sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@&${
-          guildUser.user.id
-        }> with EMAIL ${attendee.email} while setting nickname: ${err}`
-      )
-    })
+  try {
+    await guildUser.setNickname(nickname)
+    console.log('Nickname set of new user')
+  } catch (e) {
+    sendStat(
+      `<@&${discord.role.dev}>: Error with attendee <@&${
+        guildUser.user.id
+      }> with EMAIL ${attendee.email} while setting nickname: ${e}`
+    )
+  }
   // set to "Attendee" role
-  guildUser
-    .addRole(discord.role.attendee)
-    .then(console.log('Role set of new user'))
-    .catch(err => {
-      sendStat(
-        `<@&${discord.role.dev}>: Error with attendee <@&${
-          guildUser.user.id
-        }> with EMAIL ${attendee.email} while setting role: ${err}`
-      )
-    })
+  try {
+    await guildUser.addRole(discord.role.attendee)
+    console.log('Role set of new user')
+  } catch (e) {
+    sendStat(
+      `<@&${discord.role.dev}>: Error with attendee <@&${
+        guildUser.user.id
+      }> with EMAIL ${attendee.email} while setting role: ${e}`
+    )
+  }
+
   // handle locations
   if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
   if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
