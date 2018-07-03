@@ -48,9 +48,10 @@ client.on('ready', async () => {
   sendStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
-client.on('guildMemberAdd', member => {
-  Attendee.findOne({ discordId: member.id }, async (err, attendee_discord) => {
-    if (!attendee_discord) {
+client.on('guildMemberAdd', async member => {
+  try {
+    const attendeeDiscord = await Attendee.findOne({ discordId: member.id }).exec()
+    if (!attendeeDiscord) {
       member.send(
         "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
       )
@@ -63,12 +64,15 @@ client.on('guildMemberAdd', member => {
         }> JOINED the server. Be ready to assist with verification.`
       )
     } else {
-      await registerUserAgain(attendee_discord, member)
+      await registerUserAgain(attendeeDiscord, member)
     }
-  })
+  }
+  catch(e) {
+
+  }
 })
 
-client.on('message', msg => {
+client.on('message', async msg => {
   // Make sure Orpheus doesn't respond to her own message
   if (msg.author === client.user) {
     return
@@ -76,76 +80,65 @@ client.on('message', msg => {
   // Check if message is in DM
   if (!msg.guild) {
     // Check if Discord user has already been authenticated
-    Attendee.findOne({ discordId: msg.author.id }, (err, attendee_discord) => {
+    try {
+      const attendeeDiscord = await Attendee.findOne({ discordId: msg.author.id }).exec()
       // If account hasn't been authed, allow auth
-      if (!attendee_discord) {
-        // Check for valid email address
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        if (emailRegex.test(msg.content.toLowerCase())) {
-          const attendeeEmail = msg.content.toLowerCase()
-          Attendee.findOne({ email: attendeeEmail }, (err, attendee) => {
-            if (err) console.log(err)
-
-            if (!attendee) {
-              msg.channel.send('**You are not an attendee.**')
-            } else {
-              // otherwise, ensure the attendee hasn't already registered before continuing
-              if (!attendee.hasRegistered) {
-                // update attendee to be registered (hasRegistered = true)
-                Attendee.update(
-                  { email: attendeeEmail },
-                  { hasRegistered: true, discordId: msg.author.id },
-                  async (err, raw) => {
-                    // if attendee data is saved, register user on server
-                    if (raw.ok) {
-                      await registerUser(attendee, msg)
-                    } else {
-                      msg.channel.send(
-                        'An error occurred, **organizers have been notified.**'
-                      )
-                      sendStat(
-                        `<@&${discord.role.dev}>: ERROR: Attendee with ID ${
-                          attendee.id
-                        } and EMAIL ${
-                          attendee.email
-                        } could NOT update hasRegistered (true) or discordId (${
-                          attendee.discordId
-                        }).`
-                      )
-                    }
-                  }
-                )
-              } else if (!attendee.hasRegistered) {
-                msg.channel.send(
-                  'An error occurred when fetching your attendee data. **Organizers have been notified.**'
-                )
-                sendStat(
-                  `<@&${discord.role.dev}>: ERROR: Attendee ${attendee.id} (${
-                    attendee.email
-                  }) has invalid "hasRegistered" state.`
-                )
-              } else {
-                msg.channel.send(
-                  'You have already registered. **Please contact an organizer for help.**'
-                )
-                sendStat(
-                  `WARN: Attendee ${attendee.id} (${
-                    attendee.email
-                  }) is attempting to re-register.`
-                )
-              }
-            }
-          })
-        } else {
-          msg.channel.send(
-            "**Invalid email address! If you haven't yet signed up, head to https://hackchicago.io to do so!**"
-          )
-        }
-      } else {
-        // discord account is already registered
-        //msg.channel.send('This Discord account is already registered.');
+      if (attendeeDiscord) {
+        return
       }
-    })
+      // Check for valid email address
+      const attendeeEmail = msg.content.toLowerCase()
+      const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      if (!emailRegex.test(attendeeEmail)) {
+        msg.channel.send(
+          "**Invalid email address! If you haven't yet signed up, head to https://hackchicago.io to do so!**"
+        )
+      }
+      const attendee = await Attendee.findOne({ email: attendeeEmail }).exec()
+      if (!attendee) {
+        msg.channel.send('**You are not an attendee.**')
+        return
+      }
+      // otherwise, ensure the attendee hasn't already registered before continuing
+      if (!attendee.hasRegistered) {
+        // update attendee to be registered (hasRegistered = true)
+        Attendee.update(
+          { email: attendeeEmail },
+          { hasRegistered: true, discordId: msg.author.id },
+          async (err, raw) => {
+            // if attendee data is saved, register user on server
+            if (raw.ok) {
+              await registerUser(attendee, msg)
+            } else {
+              msg.channel.send(
+                'An error occurred, **organizers have been notified.**'
+              )
+              sendStat(
+                `<@&${discord.role.dev}>: ERROR: Attendee with ID ${
+                  attendee.id
+                } and EMAIL ${
+                  attendee.email
+                } could NOT update hasRegistered (true) or discordId (${
+                  attendee.discordId
+                }).`
+              )
+            }
+          }
+        )
+      } else {
+        msg.channel.send(
+          'You have already registered. **Please contact an organizer for help.**'
+        )
+        sendStat(
+          `WARN: Attendee ${attendee.id} (${
+            attendee.email
+          }) is attempting to re-register.`
+        )
+      }
+    }
+    catch(e) {
+
+    }
   } else {
     // User is in server, handle commands
     if (msg.content == 'ping') msg.channel.send('pong')

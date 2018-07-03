@@ -5,16 +5,14 @@ const router = express.Router()
 
 router
   .route('/')
-  .get((req, res) => {
-    Attendee.find((err, attendees) => {
-      if (err) res.send(err)
-
-      res.json(attendees)
-    })
+  .get(async (req, res) => {
+    const attendees = await Attendee.find().exec()
+    res.json(attendees)
   })
   // Create an attendee (accessed at POST /api/v1/attendees)
-  .post((req, res) => {
-    Attendee.findOne({ email: req.body.email }, (err, attendee) => {
+  .post(async (req, res) => {
+    try {
+      const attendee = await Attendee.findOne({ email: req.body.email }).exec()
       if (!attendee) {
         const attendee = new Attendee()
         attendee.fname = req.body.fname
@@ -33,45 +31,44 @@ router
         attendee.gender = req.body.gender
         attendee.hasRegistered = false
         attendee.isApproved = false
-
-        attendee.save((err, attendee) => {
-          if (err) res.send(err)
-
-          res.json({ message: 'Attendee created!' })
-          sendStat(
-            `API: SUCCESS created attendee with EMAIL ${req.body.email}, ID ${
-              attendee.id
-            }`
-          )
-        })
+  
+        await attendee.save()
+        res.json({ message: 'Attendee created!' })
+        sendStat(
+          `API: SUCCESS created attendee with EMAIL ${req.body.email}, ID ${attendee.id}`
+        )
       } else {
         res
           .status(400)
           .json({ message: 'Attendee with that email already exists' })
       }
-    })
+    }
+    catch(e) {
+
+    }
   })
 
 // get/update/delete attendees by email
 router
   .route('/email/:attendee_email')
   // Get the attendee with that id (accessed at GET /api/v1/attendees/email/:attendee_email)
-  .get((req, res) => {
-    Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
-      if (err) res.send(err)
-
+  .get(async (req, res) => {
+    try {
+      const attendee = await Attendee.findOne({ email: req.params.attendee_email }).exec()
       if (!attendee) {
         res.status(400).json({ message: 'Invalid email' })
       } else {
         res.json(attendee)
       }
-    })
+    }
+    catch(e) {
+
+    }
   })
   // Update the attendee with this id (accessed at PUT /api/v1/attendees/email/:attendee_email)
-  .put((req, res) => {
-    Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
-      if (err) res.send(err)
-
+  .put(async (req, res) => {
+    try {
+      const attendee = await Attendee.findOne({ email: req.params.attendee_email }).exec()
       if (
         req.body.fname ||
         req.body.lname ||
@@ -104,63 +101,58 @@ router
           attendee.dietRestrictions = req.body.dietRestrictions
         if (req.body.gender) attendee.gender = req.body.gender
 
-        attendee.save(err => {
-          if (err) res.send(err)
-
-          res.json({ message: 'Attendee updated!' })
-          sendStat(
-            `API: SUCCESS updated attendee by EMAIL ${
-              req.params.attendee_email
-            }`
-          )
-        })
+        await attendee.save()
+        res.json({ message: 'Attendee updated!' })
+        sendStat(
+          `API: SUCCESS updated attendee by EMAIL ${
+            req.params.attendee_email
+          }`
+        )
       } else {
         res.status(400).json({ message: 'Attendee not updated!' })
       }
-    })
+    }
+    catch(e) {
+
+    }
   })
-  .delete((req, res) => {
-    Attendee.findOne({ email: req.params.attendee_email }, (err, attendee) => {
+  .delete(async (req, res) => {
+    try {
+      const attendee = await Attendee.findOne({ email: req.params.attendee_email }).exec()
       if (!attendee) {
         res.status(400).json({ message: 'Invalid attendee' })
       } else {
-        Attendee.remove(
-          {
-            email: req.params.attendee_email
-          },
-          (err, deleted_attendee) => {
-            if (err) {
-              res.send(err)
-            } else {
-              res.json({ message: 'Successfully deleted attendee' })
-              sendStat(
-                `API: SUCCESS deleted attendee by EMAIL ${
-                  req.params.attendee_email
-                }, ID ${attendee.id}`
-              )
-            }
-          }
+        const deletedAttendee = await Attendee.remove({ email: req.params.attendee_email })
+        res.json({ message: 'Successfully deleted attendee' })
+        sendStat(
+          `API: SUCCESS deleted attendee by EMAIL ${
+            req.params.attendee_email
+          }, ID ${attendee.id}`
         )
       }
-    })
+    }
+    catch(e) {
+
+    }
   })
 
 // get/update/delete attendees by ID
 router
   .route('/id/:attendee_id')
   // Get the attendee with that id (accessed at GET /api/v1/attendees/id/:attendee_id)
-  .get((req, res) => {
-    Attendee.findById(req.params.attendee_id, (err, attendee) => {
-      if (err) res.send(err)
-
+  .get(async (req, res) => {
+    try {
+      const attendee = await Attendee.findById(req.params.attendee_id).exec()
       res.json(attendee)
-    })
+    }
+    catch(e) {
+
+    }
   })
   // Update the attendee with this id (accessed at PUT /api/v1/attendees/id/:attendee_id)
-  .put((req, res) => {
-    Attendee.findById(req.params.attendee_id, (err, attendee) => {
-      if (err) res.send(err)
-
+  .put(async (req, res) => {
+    try {
+      const attendee = await Attendee.findById(req.params.attendee_id).exec()
       if (
         req.body.fname ||
         req.body.lname ||
@@ -193,41 +185,34 @@ router
           attendee.dietRestrictions = req.body.dietRestrictions
         if (req.body.gender) attendee.gender = req.body.gender
 
-        attendee.save(err => {
-          if (err) res.send(err)
-
-          res.json({ message: 'Attendee updated!' })
-          sendStat(
-            `API: SUCCESS updated attendee with ID ${req.params.attendee_id}`
-          )
-        })
+        await attendee.save()
+        res.json({ message: 'Attendee updated!' })
+        sendStat(
+          `API: SUCCESS updated attendee with ID ${req.params.attendee_id}`
+        )
       } else {
         res.status(400).json({ message: 'Attendee not updated!' })
       }
-    })
-  })
-  .delete((req, res) => {
-    Attendee.remove(
-      {
-        _id: req.params.attendee_id
-      },
-      (err, attendee) => {
-        if (err) res.send(err)
+    }
+    catch(e) {
 
-        sendStat(
-          `API: Successfully deleted attendee by ID ${req.params.attendee_id}`
-        )
-        res.json({ message: 'Successfully deleted attendee' })
-      }
+    }
+  })
+  .delete(async (req, res) => {
+    const attendee = await Attendee.remove({ _id: req.params.attendee_id })
+    sendStat(
+      `API: Successfully deleted attendee by ID ${req.params.attendee_id}`
     )
+    res.json({ message: 'Successfully deleted attendee' })
   })
 
 // Endpoint to approve attendees
 router
   .route('/id/:attendee_id/approve')
   // Accessed at GET /api/v1/attendees/id/:attendee_id/approve
-  .post((req, res) => {
-    Attendee.findById(req.params.attendee_id, (err, attendee) => {
+  .post(async (req, res) => {
+    try {
+      const attendee = await Attendee.findById(req.params.attendee_id).exec()
       request.post(
         process.env.MAILCHIMP_APPROVAL_URL,
         {
@@ -237,7 +222,7 @@ router
             pass: process.env.MAILCHIMP_APPROVAL_PASSWORD
           }
         },
-        (error, response, body) => {
+        async (error, response, body) => {
           if (response.statusCode !== 204) {
             sendStat(
               `Error while approving attendee:\n\n\`\`\`${body.detail}\`\`\``
@@ -245,22 +230,20 @@ router
             res.status(400).json({ message: body.detail })
           } else {
             attendee.isApproved = true
-            attendee.save(err => {
-              if (error) {
-                res.status(500).send(err)
-              } else {
-                res.status(200).json({ message: 'Attendee approved!' })
-                sendStat(
-                  `API: SUCCESS approved attendee with ID ${
-                    req.params.attendee_id
-                  } and EMAIL ${attendee.email}`
-                )
-              }
-            })
+            await attendee.save()
+            res.status(200).json({ message: 'Attendee approved!' })
+            sendStat(
+              `API: SUCCESS approved attendee with ID ${
+                req.params.attendee_id
+              } and EMAIL ${attendee.email}`
+            )
           }
         }
       )
-    })
+    }
+    catch(e) {
+
+    }
   })
 
 module.exports = router

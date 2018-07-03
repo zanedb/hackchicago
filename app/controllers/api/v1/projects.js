@@ -4,18 +4,14 @@ const router = express.Router()
 
 router
   .route('/')
-  .get((req, res) => {
-    Project.find((err, projects) => {
-      if (err) {
-        res.send(err)
-      } else {
-        res.status(200).json(projects)
-      }
-    })
+  .get(async (req, res) => {
+    const projects = await Project.find().exec()
+    res.json(projects)
   })
   // Create a project (accessed at POST /api/v1/projects)
-  .post((req, res) => {
-    Project.findOne({ name: req.body.name }, (err, projectResult) => {
+  .post(async (req, res) => {
+    try {
+      const projectResult = await Project.findOne({ name: req.body.name }).exec()
       if (!projectResult) {
         const project = new Project()
         project.name = req.body.name
@@ -27,24 +23,22 @@ router
         project.timestamp = `${new Date().getMonth() +
           1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
 
-        project.save((err, project) => {
-          if (err) {
-            res.send(err)
-          } else {
-            res.json({ message: 'Project created!' })
-            sendStat(
-              `API: SUCCESS created PROJECT with NAME ${
-                req.body.name
-              }, by EMAIL ${project.submitter.email}`
-            )
-          }
-        })
+        await project.save()
+        res.json({ message: 'Project created!' })
+        sendStat(
+          `API: SUCCESS created PROJECT with NAME ${
+            req.body.name
+          }, by EMAIL ${project.submitter.email}`
+        )
       } else {
         res
           .status(400)
           .json({ message: 'Project with that name already exists' })
       }
-    })
+    }
+    catch(e) {
+
+    }
   })
 
 module.exports = router
