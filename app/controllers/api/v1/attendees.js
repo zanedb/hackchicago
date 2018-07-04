@@ -5,7 +5,8 @@ const router = express.Router()
 const { notifyStat } = require('../../discordBot')
 
 // Absolute path: /api/v1/attendees
-router.route('/')
+router
+  .route('/')
   .get(async (req, res) => {
     const attendees = await Attendee.find().exec()
     res.json(attendees)
@@ -49,7 +50,8 @@ router.route('/')
   })
 
 // Get, update, or delete an attendee by email
-router.route('/email/:attendee_email')
+router
+  .route('/email/:attendee_email')
   .get(async (req, res) => {
     try {
       const attendee = await Attendee.findOne({
@@ -131,7 +133,8 @@ router.route('/email/:attendee_email')
   })
 
 // Get, update, or delete an attendee by ID
-router.route('/id/:attendee_id')
+router
+  .route('/id/:attendee_id')
   .get(async (req, res) => {
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
@@ -191,38 +194,37 @@ router.route('/id/:attendee_id')
     res.json({ message: 'Successfully deleted attendee' })
   })
 
-router.route('/id/:attendee_id/approve')
-  .post(async (req, res) => {
-    try {
-      const attendee = await Attendee.findById(req.params.attendee_id).exec()
-      request.post(
-        process.env.MAILCHIMP_APPROVAL_URL,
-        {
-          json: { email_address: attendee.email },
-          auth: {
-            user: process.env.MAILCHIMP_APPROVAL_USERNAME,
-            pass: process.env.MAILCHIMP_APPROVAL_PASSWORD
-          }
-        },
-        async (error, response, body) => {
-          if (response.statusCode !== 204) {
-            notifyStat(
-              `Error while approving attendee:\n\n\`\`\`${body.detail}\`\`\``
-            )
-            res.status(400).json({ message: body.detail })
-          } else {
-            attendee.isApproved = true
-            await attendee.save()
-            res.status(200).json({ message: 'Attendee approved!' })
-            notifyStat(
-              `API: SUCCESS approved attendee with ID ${
-                req.params.attendee_id
-              } and EMAIL ${attendee.email}`
-            )
-          }
+router.route('/id/:attendee_id/approve').post(async (req, res) => {
+  try {
+    const attendee = await Attendee.findById(req.params.attendee_id).exec()
+    request.post(
+      process.env.MAILCHIMP_APPROVAL_URL,
+      {
+        json: { email_address: attendee.email },
+        auth: {
+          user: process.env.MAILCHIMP_APPROVAL_USERNAME,
+          pass: process.env.MAILCHIMP_APPROVAL_PASSWORD
         }
-      )
-    } catch (e) {}
-  })
+      },
+      async (error, response, body) => {
+        if (response.statusCode !== 204) {
+          notifyStat(
+            `Error while approving attendee:\n\n\`\`\`${body.detail}\`\`\``
+          )
+          res.status(400).json({ message: body.detail })
+        } else {
+          attendee.isApproved = true
+          await attendee.save()
+          res.status(200).json({ message: 'Attendee approved!' })
+          notifyStat(
+            `API: SUCCESS approved attendee with ID ${
+              req.params.attendee_id
+            } and EMAIL ${attendee.email}`
+          )
+        }
+      }
+    )
+  } catch (e) {}
+})
 
 module.exports = router

@@ -4,7 +4,8 @@ const router = express.Router()
 const { notifyStat } = require('../../discordBot')
 
 // Absolute path: /api/v1/projects
-router.route('/')
+router
+  .route('/')
   .get(async (req, res) => {
     const projects = await Project.find().exec()
     res.json(projects)
