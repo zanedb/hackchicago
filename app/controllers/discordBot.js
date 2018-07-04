@@ -79,7 +79,7 @@ client.on('message', async msg => {
           async (err, raw) => {
             // if attendee data is saved, register user on server
             if (raw.ok) {
-              await registerUser(attendee, msg.author.id, msg)
+              await registerUser(attendee, msg.author.id, msg.channel)
             } else {
               msg.channel.send(
                 'An error occurred, **organizers have been notified.**'
@@ -141,7 +141,7 @@ function sendStat(message) {
   console.log(`stat: ${message}`)
 }
 
-async function registerUser(attendee, id, msg) {
+async function registerUser(attendee, id, channel) {
   // Locate user
   const guild = client.guilds.get(discord.server)
   const guildUser = guild.member(id)
@@ -151,7 +151,7 @@ async function registerUser(attendee, id, msg) {
   // Set user nickname
   try {
     await guildUser.setNickname(nickname)
-    msg.channel.send('Part 1 complete..')
+    if (channel) channel.send('Part 1 complete..')
   } catch (e) {
     sendStat(
       `<@&${discord.role.dev}>: Error with attendee <@&${
@@ -162,7 +162,7 @@ async function registerUser(attendee, id, msg) {
   // Set to "Attendee" role
   try {
     await guildUser.addRole(discord.role.attendee)
-    msg.channel.send('Part 2 complete..')
+    if (channel) channel.send('Part 2 complete..')
   } catch (e) {
     sendStat(
       `<@&${discord.role.dev}>: Error with attendee <@&${
@@ -175,9 +175,9 @@ async function registerUser(attendee, id, msg) {
   if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
   if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
-  if (msg) {
+  if (channel) {
     // Welcome user
-    msg.channel.send(
+    channel.send(
       `**Welcome aboard, ${
         attendee.fname
       }! Please return to the Hack Chicago server!**`
