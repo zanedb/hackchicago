@@ -1,7 +1,7 @@
 const express = require('express')
-const Project = require('../../../models/project')
+const Project = require('../../models/project')
 const router = express.Router()
-const { notifyStat } = require('../../discordBot')
+const { notifyStat } = require('../discordBot')
 
 // Absolute path: /v1/projects
 router
