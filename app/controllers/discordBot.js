@@ -8,7 +8,6 @@ client.login(process.env.DISCORD_TOKEN)
 
 // Set up Discord bot
 client.on('ready', async () => {
-  notifyStat(`\`\`\`${client.guilds}\`\`\``);
   console.log(`Logged in as ${client.user.tag}!`)
   const game = '!help for help'
   try {
@@ -18,6 +17,7 @@ client.on('ready', async () => {
     console.error(e)
   }
   notifyStat(`<@&${discord.role.dev}>: Bot is live!`)
+  console.log(`\`\`\`${client.guilds.get(discord.server).roles}\`\`\``);
 })
 
 client.on('guildMemberAdd', async member => {
