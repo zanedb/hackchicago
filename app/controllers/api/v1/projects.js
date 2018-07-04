@@ -11,7 +11,9 @@ router
   // Create a project (accessed at POST /api/v1/projects)
   .post(async (req, res) => {
     try {
-      const projectResult = await Project.findOne({ name: req.body.name }).exec()
+      const projectResult = await Project.findOne({
+        name: req.body.name
+      }).exec()
       if (!projectResult) {
         const project = new Project()
         project.name = req.body.name
@@ -26,19 +28,16 @@ router
         await project.save()
         res.json({ message: 'Project created!' })
         sendStat(
-          `API: SUCCESS created PROJECT with NAME ${
-            req.body.name
-          }, by EMAIL ${project.submitter.email}`
+          `API: SUCCESS created PROJECT with NAME ${req.body.name}, by EMAIL ${
+            project.submitter.email
+          }`
         )
       } else {
         res
           .status(400)
           .json({ message: 'Project with that name already exists' })
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
 
 module.exports = router

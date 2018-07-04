@@ -3,7 +3,7 @@ const request = require('request')
 const Attendee = require('../../../models/attendee')
 const router = express.Router()
 
-router  
+router
   .route('/')
   .get(async (req, res) => {
     const attendees = await Attendee.find().exec()
@@ -31,21 +31,20 @@ router
         attendee.gender = req.body.gender
         attendee.hasRegistered = false
         attendee.isApproved = false
-  
+
         await attendee.save()
         res.json({ message: 'Attendee created!' })
         sendStat(
-          `API: SUCCESS created attendee with EMAIL ${req.body.email}, ID ${attendee.id}`
+          `API: SUCCESS created attendee with EMAIL ${req.body.email}, ID ${
+            attendee.id
+          }`
         )
       } else {
         res
           .status(400)
           .json({ message: 'Attendee with that email already exists' })
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
 
 // get/update/delete attendees by email
@@ -54,21 +53,22 @@ router
   // Get the attendee with that id (accessed at GET /api/v1/attendees/email/:attendee_email)
   .get(async (req, res) => {
     try {
-      const attendee = await Attendee.findOne({ email: req.params.attendee_email }).exec()
+      const attendee = await Attendee.findOne({
+        email: req.params.attendee_email
+      }).exec()
       if (!attendee) {
         res.status(400).json({ message: 'Invalid email' })
       } else {
         res.json(attendee)
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
   // Update the attendee with this id (accessed at PUT /api/v1/attendees/email/:attendee_email)
   .put(async (req, res) => {
     try {
-      const attendee = await Attendee.findOne({ email: req.params.attendee_email }).exec()
+      const attendee = await Attendee.findOne({
+        email: req.params.attendee_email
+      }).exec()
       if (
         req.body.fname ||
         req.body.lname ||
@@ -104,25 +104,24 @@ router
         await attendee.save()
         res.json({ message: 'Attendee updated!' })
         sendStat(
-          `API: SUCCESS updated attendee by EMAIL ${
-            req.params.attendee_email
-          }`
+          `API: SUCCESS updated attendee by EMAIL ${req.params.attendee_email}`
         )
       } else {
         res.status(400).json({ message: 'Attendee not updated!' })
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
   .delete(async (req, res) => {
     try {
-      const attendee = await Attendee.findOne({ email: req.params.attendee_email }).exec()
+      const attendee = await Attendee.findOne({
+        email: req.params.attendee_email
+      }).exec()
       if (!attendee) {
         res.status(400).json({ message: 'Invalid attendee' })
       } else {
-        const deletedAttendee = await Attendee.remove({ email: req.params.attendee_email })
+        const deletedAttendee = await Attendee.remove({
+          email: req.params.attendee_email
+        })
         res.json({ message: 'Successfully deleted attendee' })
         sendStat(
           `API: SUCCESS deleted attendee by EMAIL ${
@@ -130,10 +129,7 @@ router
           }, ID ${attendee.id}`
         )
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
 
 // get/update/delete attendees by ID
@@ -144,10 +140,7 @@ router
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
       res.json(attendee)
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
   // Update the attendee with this id (accessed at PUT /api/v1/attendees/id/:attendee_id)
   .put(async (req, res) => {
@@ -193,10 +186,7 @@ router
       } else {
         res.status(400).json({ message: 'Attendee not updated!' })
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
   .delete(async (req, res) => {
     const attendee = await Attendee.remove({ _id: req.params.attendee_id })
@@ -240,10 +230,7 @@ router
           }
         }
       )
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   })
 
 module.exports = router

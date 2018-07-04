@@ -7,11 +7,10 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Attendee = require('./app/models/attendee')
 const commands = require('./config/commands')
-let discord;
+let discord
 if (process.env.NODE_ENV === 'production') {
   discord = require('./config/discord')
-}
-else {
+} else {
   discord = require('./config/discord-dev')
 }
 const client = new Discord.Client()
@@ -56,7 +55,9 @@ client.on('ready', async () => {
 
 client.on('guildMemberAdd', async member => {
   try {
-    const attendeeDiscord = await Attendee.findOne({ discordId: member.id }).exec()
+    const attendeeDiscord = await Attendee.findOne({
+      discordId: member.id
+    }).exec()
     if (!attendeeDiscord) {
       member.send(
         "Welcome to Hack Chicago! Please respond with your email address to confirm you're an attendee."
@@ -72,10 +73,7 @@ client.on('guildMemberAdd', async member => {
     } else {
       await registerUserAgain(attendeeDiscord, member)
     }
-  }
-  catch(e) {
-
-  }
+  } catch (e) {}
 })
 
 client.on('message', async msg => {
@@ -87,7 +85,9 @@ client.on('message', async msg => {
   if (!msg.guild) {
     // Check if Discord user has already been authenticated
     try {
-      const attendeeDiscord = await Attendee.findOne({ discordId: msg.author.id }).exec()
+      const attendeeDiscord = await Attendee.findOne({
+        discordId: msg.author.id
+      }).exec()
       // If account hasn't been authed, allow auth
       if (attendeeDiscord) {
         return
@@ -141,10 +141,7 @@ client.on('message', async msg => {
           }) is attempting to re-register.`
         )
       }
-    }
-    catch(e) {
-
-    }
+    } catch (e) {}
   } else {
     // User is in server, handle commands
     if (msg.content == 'ping') msg.channel.send('pong')
