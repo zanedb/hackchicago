@@ -32,7 +32,7 @@ client.on('guildMemberAdd', async member => {
       const guild = client.guilds.get(discord.server)
       const guildUser = guild.member(member.id)
       notifyStat(
-        `STAT: New attendee <@&${
+        `STAT: New attendee <@${
           guildUser.user.id
         }> JOINED the server. Be ready to assist with verification.`
       )
@@ -124,7 +124,7 @@ client.on('message', async msg => {
       notifyStat(
         `<@&${discord.role.organizers}>: Help has been requested in <#${
           msg.channel.id
-        }>.`
+        }> by <@${msg.author.id}>.`
       )
       msg.channel.send('**Organizers have been NOTIFIED.**')
     } else {
@@ -161,7 +161,7 @@ async function registerUser(attendee, id, channel) {
     if (channel) channel.send('Part 1 complete..')
   } catch (e) {
     notifyStat(
-      `<@&${discord.role.dev}>: Error with attendee <@&${
+      `<@&${discord.role.dev}>: Error with attendee <@${
         guildUser.user.id
       }> with EMAIL ${attendee.email} while setting nickname: ${e}`
     )
@@ -171,7 +171,7 @@ async function registerUser(attendee, id, channel) {
     if (channel) channel.send('Part 2 complete..')
   } catch (e) {
     notifyStat(
-      `<@&${discord.role.dev}>: Error with attendee <@&${
+      `<@&${discord.role.dev}>: Error with attendee <@${
         guildUser.user.id
       }> with EMAIL ${attendee.email} while setting role: ${e}`
     )
@@ -188,14 +188,14 @@ async function registerUser(attendee, id, channel) {
       }! Please return to the Hack Chicago server!**`
     )
     notifyStat(
-      `STAT: Attendee <@&${guildUser.user.id}> with ID ${
+      `STAT: Attendee <@${guildUser.user.id}> with ID ${
         attendee.id
       } and EMAIL ${attendee.email} has just BEEN VERIFIED!`
     )
   } else {
     console.log(`New user ${attendee.fname} has been successfully onboarded`)
     notifyStat(
-      `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
+      `STAT: REJOINING Attendee <@${guildUser.user.id}> with ID ${
         attendee.id
       } and EMAIL ${attendee.email} has just BEEN RE-VERIFIED!`
     )
