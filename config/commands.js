@@ -1,4 +1,4 @@
-const discord = require(`./${DISCORD_CONFIG_FILE}`)
+const discord = require(`./${process.env.DISCORD_CONFIG_FILE}`)
 
 module.exports = {
   about: `
