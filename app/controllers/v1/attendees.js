@@ -4,7 +4,7 @@ const Attendee = require('../../../models/attendee')
 const router = express.Router()
 const { notifyStat } = require('../../discordBot')
 
-// Absolute path: /api/v1/attendees
+// Absolute path: /v1/attendees
 router
   .route('/')
   .get(async (req, res) => {
