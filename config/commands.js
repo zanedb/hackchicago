@@ -27,21 +27,7 @@ module.exports = {
 - Inform you of Hack Chicago rules: \`!rules\`
   `,
   organizers: `
-**Organizers:**
-- Amy C.: Marketing Team
-- Annie W.: Design Team
-- Ava S.: Marketing Team
-- Bhargav Y.: Finance Team
-- Megan C.: Operations Lead
-- Michael P.: Logistics Team
-- Mingjie J.: Marketing Lead
-- Musa K.: Marketing Team
-- Sean K.: Logistics Team
-- Victor T.: Tech Team
-- Yev B.: Tech Team
-- Zane D.: Tech Lead
-
-**And of course, our beloved Orpheus!**
+**TODO**
   `,
   rules: `
 **Rules:**
