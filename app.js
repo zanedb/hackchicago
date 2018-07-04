@@ -7,7 +7,13 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Attendee = require('./app/models/attendee')
 const commands = require('./config/commands')
-const discord = require('./config/discord')
+let discord;
+if (process.env.NODE_ENV === 'production') {
+  discord = require('./config/discord')
+}
+else {
+  discord = require('./config/discord-dev')
+}
 const client = new Discord.Client()
 const app = express()
 
