@@ -12,6 +12,7 @@
       MAILCHIMP_APPROVAL_URL=
       MAILCHIMP_APPROVAL_USERNAME=
       MAILCHIMP_APPROVAL_PASSWORD=
+      NODE_ENV=production
       ```
   - To run:
     ```
@@ -24,6 +25,7 @@
       DISCORD_CONFIG_FILE=discord-dev
       MONGODB_URI=[set up locally and enter URI here]
       AUTH_KEY=test
+      NODE_ENV=development
       ```
     - Use [this link](https://discord.gg/UE8ZMgr) to join the *TESTING* Discord server
     - To run in testing mode:
