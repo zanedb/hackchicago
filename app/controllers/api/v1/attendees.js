@@ -3,7 +3,7 @@ const request = require('request')
 const Attendee = require('../../../models/attendee')
 const router = express.Router()
 
-router
+router  
   .route('/')
   .get(async (req, res) => {
     const attendees = await Attendee.find().exec()
