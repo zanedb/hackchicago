@@ -120,7 +120,11 @@ client.on('message', async msg => {
     if (commands.hasOwnProperty(command)) {
       msg.channel.send(commands[command])
     } else if (command === 'organizers-confirm') {
-      sendStat(`<@&${discord.role.organizers}>: Help has been requested in <#${msg.channel.id}>.`)
+      sendStat(
+        `<@&${discord.role.organizers}>: Help has been requested in <#${
+          msg.channel.id
+        }>.`
+      )
       msg.channel.send('**Organizers have been NOTIFIED.**')
     } else {
       msg.channel.send("That command doesn't exist!")
