@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const AttendeeSchema = new Schema({
   fname: String,
@@ -20,6 +20,6 @@ const AttendeeSchema = new Schema({
   discordId: String,
   hasRegistered: Boolean,
   isApproved: Boolean
-});
+})
 
-module.exports = mongoose.model('Attendee', AttendeeSchema);
+module.exports = mongoose.model('Attendee', AttendeeSchema)
