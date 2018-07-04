@@ -1,10 +1,4 @@
-let discord;
-if (process.env.NODE_ENV === 'production') {
-  discord = require('./discord')
-}
-else {
-  discord = require('./discord-dev')
-}
+const discord = require(`./${DISCORD_CONFIG_FILE}`)
 
 module.exports = {
   about: `
