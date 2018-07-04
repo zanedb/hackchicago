@@ -14,7 +14,7 @@ module.exports = {
 - \`!help\`: Get help from me :raised_back_of_hand:
 - \`!commands\`: This one! :point_up_2:
 - \`!rules\`: List the rules :straight_ruler:
-- \`!organizers\`: List all organizers :bust_in_silhouette:
+- \`!organizers\`: Notify all organizers, use carefully :warning:
 - \`!website\`: Learn about our website :computer:
 - \`!social\`: Check out our social media :chart_with_upwards_trend:
   `,
@@ -27,7 +27,8 @@ module.exports = {
 - Inform you of Hack Chicago rules: \`!rules\`
   `,
   organizers: `
-**TODO**
+**Notify ALL organizers**
+Are you **sure** you want to do this? Unnecessary/too frequent usage will result in a **ban**.
   `,
   rules: `
 **Rules:**
