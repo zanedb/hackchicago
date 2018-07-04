@@ -4,6 +4,8 @@ const Discord = require('discord.js')
 const discord = require('../../config/discord')
 const client = new Discord.Client()
 
+client.login(process.env.DISCORD_TOKEN)
+
 // Set up Discord bot
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`)
@@ -198,7 +200,5 @@ async function registerUser(attendee, id, channel) {
     )
   }
 }
-
-client.login(process.env.DISCORD_TOKEN)
 
 module.exports.notifyStat = notifyStat
