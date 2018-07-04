@@ -134,6 +134,7 @@ client.on('message', async msg => {
 })
 
 process.on('uncaughtException', ex => {
+  console.log(ex)
   notifyStat(
     `<@&${
       discord.role.dev
