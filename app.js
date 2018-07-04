@@ -7,12 +7,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Attendee = require('./app/models/attendee')
 const commands = require('./config/commands')
-let discord
-if (process.env.NODE_ENV === 'production') {
-  discord = require('./config/discord')
-} else {
-  discord = require('./config/discord-dev')
-}
+// load different Discord config file based on environment
+const discord = require(`./config/${process.env.DISCORD_CONFIG_FILE}`)
 const client = new Discord.Client()
 const app = express()
 
