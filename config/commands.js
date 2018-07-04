@@ -17,7 +17,6 @@ module.exports = {
     - \`!organizers\`: List all organizers :bust_in_silhouette:
     - \`!website\`: Learn about our website :computer:
     - \`!social\`: Check out our social media :chart_with_upwards_trend:
-    - \`!sponsors\`: View our lovely sponsors :blush:
   `,
   help: `
     **Hi, I'm Orpheus, the official Hack Chicago Dino! I can:**
@@ -59,20 +58,6 @@ module.exports = {
     - Facebook: https://facebook.com/hackchicago
 
     **Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/
-  `,
-  sponsors: `
-    **We'd like to thank our amazing sponsors!**
-
-    - McDonalds: https://www.mcdonalds.com
-    - Paylocity: https://www.paylocity.com
-    - Balsamiq: https://balsamiq.com
-    - Flexera: https://www.flexera.com
-    - Neighborhoods.com: https://www.neighborhoods.com
-    - Repl.it: https://repl.it
-    - Belvedere Trading: https://www.belvederetrading.com
-    - Civis Analytics: https://new.civisanalytics.com
-    - Tastytrade: https://www.tastytrade.com/tt/
-    - Tastyworks: https://tastyworks.com/
   `,
   stayawake: 'No.',
   website: 'Check out our **website** at https://hackchicago.io/.' /* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/,
