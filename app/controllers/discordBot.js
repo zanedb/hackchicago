@@ -185,7 +185,6 @@ async function registerUser(attendee, id, channel) {
         attendee.fname
       }! Please return to the Hack Chicago server!**`
     )
-    // Inform organizers
     notifyStat(
       `STAT: Attendee <@&${guildUser.user.id}> with ID ${
         attendee.id
@@ -193,7 +192,6 @@ async function registerUser(attendee, id, channel) {
     )
   } else {
     console.log(`New user ${attendee.fname} has been successfully onboarded`)
-    // Inform organizers
     notifyStat(
       `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
         attendee.id
