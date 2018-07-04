@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.redirect(302, 'https://hackchicago.io')
 })
 
-app.use('/api/v1/*', (req, res, next) => {
+app.use('/v1/*', (req, res, next) => {
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
     next()
@@ -24,9 +24,9 @@ app.use('/api/v1/*', (req, res, next) => {
     res.status(403).json({ message: 'Please authenticate.' })
   }
 })
-app.use('/api/v1/attendees', require('./app/controllers/api/v1/attendees'))
-app.use('/api/v1/projects', require('./app/controllers/api/v1/projects'))
-app.use('/api/v1/referrals', require('./app/controllers/api/v1/referrals'))
+app.use('/v1/attendees', require('./app/controllers/api/v1/attendees'))
+app.use('/v1/projects', require('./app/controllers/api/v1/projects'))
+app.use('/v1/referrals', require('./app/controllers/api/v1/referrals'))
 
 mongoose.connect(process.env.MONGODB_URI)
 
