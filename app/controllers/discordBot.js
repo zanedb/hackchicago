@@ -1,8 +1,7 @@
 const Attendee = require('../models/attendee')
 const commands = require('../../config/commands')
 const Discord = require('discord.js')
-// Load different Discord config file based on environment
-const discord = require(`../../config/${process.env.DISCORD_CONFIG_FILE}`)
+const discord = require('../../config/discord')
 const client = new Discord.Client()
 
 // Set up Discord bot

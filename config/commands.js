@@ -1,4 +1,4 @@
-const discord = require(`./${process.env.DISCORD_CONFIG_FILE}`)
+const discord = require('./discord')
 
 module.exports = {
   about: `
@@ -48,6 +48,7 @@ You must adhere to both the Hack Club & MLH Code of Conducts.
 **Be sure to also join our Facebook group!** https://www.facebook.com/groups/hackchicago/
   `,
   stayawake: 'No.',
-  website: 'Check out our **website** at https://hackchicago.io/.' /* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/,
-  '': "No command specified!"
+  website:
+    'Check out our **website** at https://hackchicago.io/.' /* Also, get **up to date alerts** for every announcement at https://hackchicago.io/live.'*/,
+  '': 'No command specified!'
 }
