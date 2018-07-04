@@ -1,9 +1,9 @@
 {
-  "name": "hackchicago",
+  "name": "hackchicago-api",
   "version": "1.0.0",
-  "description": "Hack Chicago Software (Discord Bot, Data Tools)",
+  "description": "Hack Chicago API + Discord Bot",
   "main": "app.js",
-  "repository": "https://github.com/hackchicago/internals",
+  "repository": "https://github.com/hackchicago/api",
   "author": "@zanedb",
   "license": "MIT",
   "engine": {
