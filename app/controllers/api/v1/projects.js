@@ -1,6 +1,7 @@
 const express = require('express')
 const Project = require('../../../models/project')
 const router = express.Router()
+const { sendStat } = require('../../discordBot')
 
 router
   .route('/')
