@@ -16,8 +16,7 @@ client.on('ready', async () => {
   } catch (e) {
     console.error(e)
   }
-  console.log(client.guilds.get(discord.server).channels);
-  //notifyStat(`<@&${discord.role.dev}>: Bot is live!`)
+  notifyStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
 client.on('guildMemberAdd', async member => {
