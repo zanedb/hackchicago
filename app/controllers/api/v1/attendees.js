@@ -2,7 +2,7 @@ const express = require('express')
 const request = require('request')
 const Attendee = require('../../../models/attendee')
 const router = express.Router()
-const { sendStat } = require('../../discordBot')
+const { notifyStat } = require('../../discordBot')
 
 router
   .route('/')
@@ -35,7 +35,7 @@ router
 
         await attendee.save()
         res.json({ message: 'Attendee created!' })
-        sendStat(
+        notifyStat(
           `API: SUCCESS created attendee with EMAIL ${req.body.email}, ID ${
             attendee.id
           }`
@@ -104,7 +104,7 @@ router
 
         await attendee.save()
         res.json({ message: 'Attendee updated!' })
-        sendStat(
+        notifyStat(
           `API: SUCCESS updated attendee by EMAIL ${req.params.attendee_email}`
         )
       } else {
@@ -124,7 +124,7 @@ router
           email: req.params.attendee_email
         })
         res.json({ message: 'Successfully deleted attendee' })
-        sendStat(
+        notifyStat(
           `API: SUCCESS deleted attendee by EMAIL ${
             req.params.attendee_email
           }, ID ${attendee.id}`
@@ -181,7 +181,7 @@ router
 
         await attendee.save()
         res.json({ message: 'Attendee updated!' })
-        sendStat(
+        notifyStat(
           `API: SUCCESS updated attendee with ID ${req.params.attendee_id}`
         )
       } else {
@@ -191,7 +191,7 @@ router
   })
   .delete(async (req, res) => {
     const attendee = await Attendee.remove({ _id: req.params.attendee_id })
-    sendStat(
+    notifyStat(
       `API: Successfully deleted attendee by ID ${req.params.attendee_id}`
     )
     res.json({ message: 'Successfully deleted attendee' })
@@ -215,7 +215,7 @@ router
         },
         async (error, response, body) => {
           if (response.statusCode !== 204) {
-            sendStat(
+            notifyStat(
               `Error while approving attendee:\n\n\`\`\`${body.detail}\`\`\``
             )
             res.status(400).json({ message: body.detail })
@@ -223,7 +223,7 @@ router
             attendee.isApproved = true
             await attendee.save()
             res.status(200).json({ message: 'Attendee approved!' })
-            sendStat(
+            notifyStat(
               `API: SUCCESS approved attendee with ID ${
                 req.params.attendee_id
               } and EMAIL ${attendee.email}`

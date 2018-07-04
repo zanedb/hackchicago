@@ -15,7 +15,7 @@ client.on('ready', async () => {
   } catch (e) {
     console.error(e)
   }
-  sendStat(`<@&${discord.role.dev}>: Bot is live!`)
+  notifyStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
 client.on('guildMemberAdd', async member => {
@@ -30,7 +30,7 @@ client.on('guildMemberAdd', async member => {
 
       const guild = client.guilds.get(discord.server)
       const guildUser = guild.member(member.id)
-      sendStat(
+      notifyStat(
         `STAT: New attendee <@&${
           guildUser.user.id
         }> JOINED the server. Be ready to assist with verification.`
@@ -84,7 +84,7 @@ client.on('message', async msg => {
               msg.channel.send(
                 'An error occurred, **organizers have been notified.**'
               )
-              sendStat(
+              notifyStat(
                 `<@&${discord.role.dev}>: ERROR: Attendee with ID ${
                   attendee.id
                 } and EMAIL ${
@@ -100,7 +100,7 @@ client.on('message', async msg => {
         msg.channel.send(
           'You have already registered. **Please contact an organizer for help.**'
         )
-        sendStat(
+        notifyStat(
           `WARN: Attendee ${attendee.id} (${
             attendee.email
           }) is attempting to re-register.`
@@ -120,7 +120,7 @@ client.on('message', async msg => {
     if (commands.hasOwnProperty(command)) {
       msg.channel.send(commands[command])
     } else if (command === 'organizers-confirm') {
-      sendStat(
+      notifyStat(
         `<@&${discord.role.organizers}>: Help has been requested in <#${
           msg.channel.id
         }>.`
@@ -133,14 +133,14 @@ client.on('message', async msg => {
 })
 
 process.on('uncaughtException', ex => {
-  sendStat(
+  notifyStat(
     `<@&${
       discord.role.dev
     }>: OH NOES, BOT IS CRASHING\n\nError:\n\`\`\`${ex}\`\`\``
   )
 })
 
-function sendStat(message) {
+function notifyStat(message) {
   const guild = client.guilds.get(discord.server)
   const orgChannel = guild.channels.get(discord.channel.stat)
 
@@ -160,7 +160,7 @@ async function registerUser(attendee, id, channel) {
     await guildUser.setNickname(nickname)
     if (channel) channel.send('Part 1 complete..')
   } catch (e) {
-    sendStat(
+    notifyStat(
       `<@&${discord.role.dev}>: Error with attendee <@&${
         guildUser.user.id
       }> with EMAIL ${attendee.email} while setting nickname: ${e}`
@@ -171,7 +171,7 @@ async function registerUser(attendee, id, channel) {
     await guildUser.addRole(discord.role.attendee)
     if (channel) channel.send('Part 2 complete..')
   } catch (e) {
-    sendStat(
+    notifyStat(
       `<@&${discord.role.dev}>: Error with attendee <@&${
         guildUser.user.id
       }> with EMAIL ${attendee.email} while setting role: ${e}`
@@ -190,7 +190,7 @@ async function registerUser(attendee, id, channel) {
       }! Please return to the Hack Chicago server!**`
     )
     // Inform organizers
-    sendStat(
+    notifyStat(
       `STAT: Attendee <@&${guildUser.user.id}> with ID ${
         attendee.id
       } and EMAIL ${attendee.email} has just BEEN VERIFIED!`
@@ -199,7 +199,7 @@ async function registerUser(attendee, id, channel) {
     // Welcome user
     console.log(`New user ${attendee.fname} has been successfully onboarded`)
     // Inform organizers
-    sendStat(
+    notifyStat(
       `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
         attendee.id
       } and EMAIL ${attendee.email} has just BEEN RE-VERIFIED!`
@@ -209,4 +209,4 @@ async function registerUser(attendee, id, channel) {
 
 client.login(process.env.DISCORD_TOKEN)
 
-module.exports.sendStat = sendStat
+module.exports.notifyStat = notifyStat

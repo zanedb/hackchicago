@@ -1,7 +1,7 @@
 const express = require('express')
 const Project = require('../../../models/project')
 const router = express.Router()
-const { sendStat } = require('../../discordBot')
+const { notifyStat } = require('../../discordBot')
 
 router
   .route('/')
@@ -28,7 +28,7 @@ router
 
         await project.save()
         res.json({ message: 'Project created!' })
-        sendStat(
+        notifyStat(
           `API: SUCCESS created PROJECT with NAME ${req.body.name}, by EMAIL ${
             project.submitter.email
           }`
