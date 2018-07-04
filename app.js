@@ -16,6 +16,9 @@ app.get('/', (req, res) => {
   res.redirect(302, 'https://hackchicago.io')
 })
 
+app.use('/api/:endpoint', (req, res) => {
+  res.redirect(301, `/v1${req.path}`)
+})
 app.use('/v1/*', (req, res, next) => {
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
