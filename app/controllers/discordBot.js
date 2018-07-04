@@ -1,7 +1,7 @@
 const Attendee = require('../models/attendee')
 const commands = require('../../config/commands')
 const Discord = require('discord.js')
-// load different Discord config file based on environment
+// Load different Discord config file based on environment
 const discord = require(`../../config/${process.env.DISCORD_CONFIG_FILE}`)
 const client = new Discord.Client()
 
@@ -53,7 +53,7 @@ client.on('message', async msg => {
       const attendeeDiscord = await Attendee.findOne({
         discordId: msg.author.id
       }).exec()
-      // If account hasn't been authed, allow auth
+      // Only allow unauthed accounts
       if (attendeeDiscord) {
         return
       }
@@ -70,9 +70,9 @@ client.on('message', async msg => {
         msg.channel.send('**You are not an attendee.**')
         return
       }
-      // otherwise, ensure the attendee hasn't already registered before continuing
+      // Ensure the attendee hasn't already registered before continuing
       if (!attendee.hasRegistered) {
-        // update attendee to be registered (hasRegistered = true)
+        // Update attendee to be registered
         Attendee.update(
           { email: attendeeEmail },
           { hasRegistered: true, discordId: msg.author.id },
@@ -149,13 +149,11 @@ function notifyStat(message) {
 }
 
 async function registerUser(attendee, id, channel) {
-  // Locate user
   const guild = client.guilds.get(discord.server)
   const guildUser = guild.member(id)
 
   // Setup nickname to be real name (example: John D.)
   const nickname = `${attendee.fname} ${attendee.lname[0]}.`
-  // Set user nickname
   try {
     await guildUser.setNickname(nickname)
     if (channel) channel.send('Part 1 complete..')
@@ -166,7 +164,6 @@ async function registerUser(attendee, id, channel) {
       }> with EMAIL ${attendee.email} while setting nickname: ${e}`
     )
   }
-  // Set to "Attendee" role
   try {
     await guildUser.addRole(discord.role.attendee)
     if (channel) channel.send('Part 2 complete..')
@@ -183,7 +180,6 @@ async function registerUser(attendee, id, channel) {
   if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
   if (channel) {
-    // Welcome user
     channel.send(
       `**Welcome aboard, ${
         attendee.fname
@@ -196,7 +192,6 @@ async function registerUser(attendee, id, channel) {
       } and EMAIL ${attendee.email} has just BEEN VERIFIED!`
     )
   } else {
-    // Welcome user
     console.log(`New user ${attendee.fname} has been successfully onboarded`)
     // Inform organizers
     notifyStat(

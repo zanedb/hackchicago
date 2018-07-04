@@ -3,13 +3,13 @@ const Project = require('../../../models/project')
 const router = express.Router()
 const { notifyStat } = require('../../discordBot')
 
-router
-  .route('/')
+// Absolute path: /api/v1/projects
+router.route('/')
   .get(async (req, res) => {
     const projects = await Project.find().exec()
     res.json(projects)
   })
-  // Create a project (accessed at POST /api/v1/projects)
+  // Create a project
   .post(async (req, res) => {
     try {
       const projectResult = await Project.findOne({

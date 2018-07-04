@@ -4,13 +4,13 @@ const Attendee = require('../../../models/attendee')
 const router = express.Router()
 const { notifyStat } = require('../../discordBot')
 
-router
-  .route('/')
+// Absolute path: /api/v1/attendees
+router.route('/')
   .get(async (req, res) => {
     const attendees = await Attendee.find().exec()
     res.json(attendees)
   })
-  // Create an attendee (accessed at POST /api/v1/attendees)
+  // Create an attendee
   .post(async (req, res) => {
     try {
       const attendee = await Attendee.findOne({ email: req.body.email }).exec()
@@ -48,10 +48,8 @@ router
     } catch (e) {}
   })
 
-// get/update/delete attendees by email
-router
-  .route('/email/:attendee_email')
-  // Get the attendee with that id (accessed at GET /api/v1/attendees/email/:attendee_email)
+// Get, update, or delete an attendee by email
+router.route('/email/:attendee_email')
   .get(async (req, res) => {
     try {
       const attendee = await Attendee.findOne({
@@ -64,7 +62,6 @@ router
       }
     } catch (e) {}
   })
-  // Update the attendee with this id (accessed at PUT /api/v1/attendees/email/:attendee_email)
   .put(async (req, res) => {
     try {
       const attendee = await Attendee.findOne({
@@ -133,17 +130,14 @@ router
     } catch (e) {}
   })
 
-// get/update/delete attendees by ID
-router
-  .route('/id/:attendee_id')
-  // Get the attendee with that id (accessed at GET /api/v1/attendees/id/:attendee_id)
+// Get, update, or delete an attendee by ID
+router.route('/id/:attendee_id')
   .get(async (req, res) => {
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
       res.json(attendee)
     } catch (e) {}
   })
-  // Update the attendee with this id (accessed at PUT /api/v1/attendees/id/:attendee_id)
   .put(async (req, res) => {
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
@@ -197,10 +191,7 @@ router
     res.json({ message: 'Successfully deleted attendee' })
   })
 
-// Endpoint to approve attendees
-router
-  .route('/id/:attendee_id/approve')
-  // Accessed at GET /api/v1/attendees/id/:attendee_id/approve
+router.route('/id/:attendee_id/approve')
   .post(async (req, res) => {
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
