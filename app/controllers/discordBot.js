@@ -1,5 +1,3 @@
-require('dotenv').config({ path: '../../' })
-
 const Attendee = require('../models/attendee')
 const commands = require('../../config/commands')
 const Discord = require('discord.js')
