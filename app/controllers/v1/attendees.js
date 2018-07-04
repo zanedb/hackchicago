@@ -4,7 +4,7 @@ const Attendee = require('../../../models/attendee')
 const router = express.Router()
 const { notifyStat } = require('../../discordBot')
 
-// Absolute path: /v1/attendees
+// Absolute path: /api/v1/attendees
 router
   .route('/')
   .get(async (req, res) => {
@@ -17,20 +17,9 @@ router
       const attendee = await Attendee.findOne({ email: req.body.email }).exec()
       if (!attendee) {
         const attendee = new Attendee()
-        attendee.fname = req.body.fname
-        attendee.lname = req.body.lname
-        attendee.email = req.body.email
-        attendee.state = req.body.state
-        attendee.city = req.body.city
-        attendee.school = req.body.school
-        attendee.ref = req.body.ref
-        attendee.grade = req.body.grade
-        attendee.timestamp = req.body.timestamp
-        attendee.note = req.body.note
-        attendee.phone = req.body.phone
-        attendee.shirtSize = req.body.shirtSize
-        attendee.dietRestrictions = req.body.dietRestrictions
-        attendee.gender = req.body.gender
+        Object.entries(req.body).forEach(([key, value]) => {
+          attendee[key] = value
+        })
         attendee.hasRegistered = false
         attendee.isApproved = false
 
@@ -69,47 +58,18 @@ router
       const attendee = await Attendee.findOne({
         email: req.params.attendee_email
       }).exec()
-      if (
-        req.body.fname ||
-        req.body.lname ||
-        req.body.email ||
-        req.body.state ||
-        req.body.city ||
-        req.body.school ||
-        req.body.ref ||
-        req.body.grade ||
-        req.body.timestamp ||
-        req.body.note ||
-        req.body.phone ||
-        req.body.shirtSize ||
-        req.body.dietRestrictions ||
-        req.body.gender
-      ) {
-        if (req.body.fname) attendee.fname = req.body.fname
-        if (req.body.lname) attendee.lname = req.body.lname
-        if (req.body.email) attendee.email = req.body.email
-        if (req.body.state) attendee.state = req.body.state
-        if (req.body.city) attendee.city = req.body.city
-        if (req.body.school) attendee.school = req.body.school
-        if (req.body.ref) attendee.ref = req.body.ref
-        if (req.body.grade) attendee.grade = req.body.grade
-        if (req.body.timestamp) attendee.timestamp = req.body.timestamp
-        if (req.body.note) attendee.note = req.body.note
-        if (req.body.phone) attendee.phone = req.body.phone
-        if (req.body.shirtSize) attendee.shirtSize = req.body.shirtSize
-        if (req.body.dietRestrictions)
-          attendee.dietRestrictions = req.body.dietRestrictions
-        if (req.body.gender) attendee.gender = req.body.gender
+      Object.entries(req.body).forEach(([key, value]) => {
+        attendee[key] = value
+      })
 
-        await attendee.save()
-        res.json({ message: 'Attendee updated!' })
-        notifyStat(
-          `API: SUCCESS updated attendee by EMAIL ${req.params.attendee_email}`
-        )
-      } else {
-        res.status(400).json({ message: 'Attendee not updated!' })
-      }
-    } catch (e) {}
+      await attendee.save()
+      res.json({ message: 'Attendee updated!' })
+      notifyStat(
+        `API: SUCCESS updated attendee by EMAIL ${req.params.attendee_email}`
+      )
+    } catch (e) {
+      res.status(400).json({ message: 'Attendee not updated!' })
+    }
   })
   .delete(async (req, res) => {
     try {
@@ -144,47 +104,18 @@ router
   .put(async (req, res) => {
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
-      if (
-        req.body.fname ||
-        req.body.lname ||
-        req.body.email ||
-        req.body.state ||
-        req.body.city ||
-        req.body.school ||
-        req.body.ref ||
-        req.body.grade ||
-        req.body.timestamp ||
-        req.body.note ||
-        req.body.phone ||
-        req.body.shirtSize ||
-        req.body.dietRestrictions ||
-        req.body.gender
-      ) {
-        if (req.body.fname) attendee.fname = req.body.fname
-        if (req.body.lname) attendee.lname = req.body.lname
-        if (req.body.email) attendee.email = req.body.email
-        if (req.body.state) attendee.state = req.body.state
-        if (req.body.city) attendee.city = req.body.city
-        if (req.body.school) attendee.school = req.body.school
-        if (req.body.ref) attendee.ref = req.body.ref
-        if (req.body.grade) attendee.grade = req.body.grade
-        if (req.body.timestamp) attendee.timestamp = req.body.timestamp
-        if (req.body.note) attendee.note = req.body.note
-        if (req.body.phone) attendee.phone = req.body.phone
-        if (req.body.shirtSize) attendee.shirtSize = req.body.shirtSize
-        if (req.body.dietRestrictions)
-          attendee.dietRestrictions = req.body.dietRestrictions
-        if (req.body.gender) attendee.gender = req.body.gender
+      Object.entries(req.body).forEach(([key, value]) => {
+        attendee[key] = value
+      })
 
-        await attendee.save()
-        res.json({ message: 'Attendee updated!' })
-        notifyStat(
-          `API: SUCCESS updated attendee with ID ${req.params.attendee_id}`
-        )
-      } else {
-        res.status(400).json({ message: 'Attendee not updated!' })
-      }
-    } catch (e) {}
+      await attendee.save()
+      res.json({ message: 'Attendee updated!' })
+      notifyStat(
+        `API: SUCCESS updated attendee with ID ${req.params.attendee_id}`
+      )
+    } catch (e) {
+      res.status(400).json({ message: 'Attendee not updated!' })
+    }
   })
   .delete(async (req, res) => {
     const attendee = await Attendee.remove({ _id: req.params.attendee_id })
