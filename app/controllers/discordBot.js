@@ -38,7 +38,7 @@ client.on('guildMemberAdd', async member => {
         }> JOINED the server. Be ready to assist with verification.`
       )
     } else {
-      await registerUserAgain(attendeeDiscord, member)
+      await registerUser(attendeeDiscord, member.id)
     }
   } catch (e) {}
 })
@@ -81,7 +81,7 @@ client.on('message', async msg => {
           async (err, raw) => {
             // if attendee data is saved, register user on server
             if (raw.ok) {
-              await registerUser(attendee, msg)
+              await registerUser(attendee, msg.author.id, msg)
             } else {
               msg.channel.send(
                 'An error occurred, **organizers have been notified.**'
@@ -143,10 +143,9 @@ function sendStat(message) {
   console.log(`stat: ${message}`)
 }
 
-async function registerUser(attendee, msg) {
+async function registerUser(attendee, id, msg) {
   // Locate user
   const guild = client.guilds.get(discord.server)
-  const id = msg.author.id
   const guildUser = guild.member(id)
 
   // Setup nickname to be real name (example: John D.)
@@ -178,63 +177,29 @@ async function registerUser(attendee, msg) {
   if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
   if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
 
-  // Welcome user
-  msg.channel.send(
-    `**Welcome aboard, ${
-      attendee.fname
-    }! Please return to the Hack Chicago server!**`
-  )
-  // Inform organizers
-  sendStat(
-    `STAT: Attendee <@&${guildUser.user.id}> with ID ${attendee.id} and EMAIL ${
-      attendee.email
-    } has just BEEN VERIFIED!`
-  )
-}
-
-async function registerUserAgain(attendee, member) {
-  // Locate user
-  const guild = client.guilds.get(discord.server)
-  const id = member.id
-  const guildUser = guild.member(id)
-
-  // Setup nickname to be real name (example: John D.)
-  const nickname = `${attendee.fname} ${attendee.lname[0]}.`
-  // Set user nickname
-  try {
-    await guildUser.setNickname(nickname)
-    console.log('Nickname set of new user')
-  } catch (e) {
+  if (msg) {
+    // Welcome user
+    msg.channel.send(
+      `**Welcome aboard, ${
+        attendee.fname
+      }! Please return to the Hack Chicago server!**`
+    )
+    // Inform organizers
     sendStat(
-      `<@&${discord.role.dev}>: Error with attendee <@&${
-        guildUser.user.id
-      }> with EMAIL ${attendee.email} while setting nickname: ${e}`
+      `STAT: Attendee <@&${guildUser.user.id}> with ID ${attendee.id} and EMAIL ${
+        attendee.email
+      } has just BEEN VERIFIED!`
+    )
+  } else {
+    // Welcome user
+    console.log(`New user ${attendee.fname} has been successfully onboarded`)
+    // Inform organizers
+    sendStat(
+      `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
+        attendee.id
+      } and EMAIL ${attendee.email} has just BEEN RE-VERIFIED!`
     )
   }
-  // Set to "Attendee" role
-  try {
-    await guildUser.addRole(discord.role.attendee)
-    console.log('Role set of new user')
-  } catch (e) {
-    sendStat(
-      `<@&${discord.role.dev}>: Error with attendee <@&${
-        guildUser.user.id
-      }> with EMAIL ${attendee.email} while setting role: ${e}`
-    )
-  }
-
-  // Handle locations
-  if (attendee.state === 'Ohio') guildUser.addRole(discord.role.ohio)
-  if (attendee.state === 'Illinois') guildUser.addRole(discord.role.illinois)
-
-  // Welcome user
-  console.log(`New user ${attendee.fname} has been successfully onboarded`)
-  // Inform organizers
-  sendStat(
-    `STAT: REJOINING Attendee <@&${guildUser.user.id}> with ID ${
-      attendee.id
-    } and EMAIL ${attendee.email} has just BEEN RE-VERIFIED!`
-  )
 }
 
 client.login(process.env.DISCORD_TOKEN)
