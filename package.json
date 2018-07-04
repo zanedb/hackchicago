@@ -1,5 +1,5 @@
 {
-  "name": "hackchicago-api",
+  "name": "hackchicago",
   "version": "1.0.0",
   "description": "Hack Chicago API + Discord Bot",
   "main": "app.js",
