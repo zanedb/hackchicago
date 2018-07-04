@@ -16,7 +16,7 @@ client.on('ready', async () => {
   } catch (e) {
     console.error(e)
   }
-  console.log(client.guilds);
+  console.log(client.guilds.get(discord.server).roles);
   //notifyStat(`<@&${discord.role.dev}>: Bot is live!`)
 })
 
