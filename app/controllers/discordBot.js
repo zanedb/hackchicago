@@ -186,9 +186,9 @@ async function registerUser(attendee, id, msg) {
     )
     // Inform organizers
     sendStat(
-      `STAT: Attendee <@&${guildUser.user.id}> with ID ${attendee.id} and EMAIL ${
-        attendee.email
-      } has just BEEN VERIFIED!`
+      `STAT: Attendee <@&${guildUser.user.id}> with ID ${
+        attendee.id
+      } and EMAIL ${attendee.email} has just BEEN VERIFIED!`
     )
   } else {
     // Welcome user
@@ -204,4 +204,4 @@ async function registerUser(attendee, id, msg) {
 
 client.login(process.env.DISCORD_TOKEN)
 
-module.exports.sendStat = sendStat;
+module.exports.sendStat = sendStat
