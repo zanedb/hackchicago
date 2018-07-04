@@ -20,7 +20,7 @@
     "request": "^2.87.0"
   },
   "scripts": {
-    "fmt": "prettier \"{app/**,}/*.js\" \"app.js\" --single-quote --no-semi --write",
+    "fmt": "prettier \"{app/**,config/**}/*.js\" \"app.js\" --single-quote --no-semi --write",
     "precommit": "yarn run fmt",
     "start": "node -r dotenv/config app.js"
   },
