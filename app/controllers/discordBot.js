@@ -164,7 +164,7 @@ async function registerUser(attendee, id, channel) {
     )
   }
   try {
-    await guildUser.addRole(discord.role.attendee)
+    await guildUser.addRole(discord.role.attendees)
     if (channel) channel.send('Part 2 complete..')
   } catch (e) {
     notifyStat(
