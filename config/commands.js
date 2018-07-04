@@ -27,8 +27,9 @@ module.exports = {
 - Inform you of Hack Chicago rules: \`!rules\`
   `,
   organizers: `
-**Notify ALL organizers**
+:warning: **Notify ALL organizers**
 Are you **sure** you want to do this? Unnecessary/too frequent usage will result in a **ban**.
+Please type \`!organizers-confirm\` to send this.
   `,
   rules: `
 **Rules:**
