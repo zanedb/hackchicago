@@ -125,7 +125,7 @@ router
     res.json({ message: 'Successfully deleted attendee' })
   })
 
-router.route('/id/:attendee_id/approve').post(async (req, res) => {
+router.route('/id/:attendee_id/approve').get(async (req, res) => {
   try {
     const attendee = await Attendee.findById(req.params.attendee_id).exec()
     request.post(
