@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.redirect(302, 'https://hackchicago.io')
 })
 
-app.use('/api/:endpoint', (req, res) => {
+app.use('/api/v1/:endpoint', (req, res) => {
   res.redirect(301, `/v1${req.path}`)
 })
 app.use('/v1/*', (req, res, next) => {
