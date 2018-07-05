@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/:endpoint', (req, res) => {
-  res.redirect(301, `/v1${req.path}`)
+  res.redirect(301, `/v1/${req.params.endpoint}`)
 })
 app.use('/v1/*', (req, res, next) => {
   if (req.get('Auth') === process.env.AUTH_KEY) {
