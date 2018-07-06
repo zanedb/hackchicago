@@ -3,6 +3,15 @@ const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
+const passwordless = require('passwordless');
+const mongoStore = require('passwordless-mongostore');
+
+passwordless.init(new MongoStore(process.env.MONGODB_URI));
+passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
+  const host = 'http://localhost:3000';
+  console.log(`${host}/?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`);
+  var host = 'localhost:3000';
+});
 
 const discordBot = require('./app/controllers/discordBot')
 
@@ -15,6 +24,14 @@ const port = process.env.PORT || 3000
 app.get('/', (req, res) => {
   res.redirect(302, 'https://hackchicago.io')
 })
+
+app.post('/login',
+  passport.authenticate('local'),
+  function(req, res) {
+    // If this function gets called, authentication was successful.
+    // `req.user` contains the authenticated user.
+    res.redirect('/users/' + req.user.username);
+  });
 
 app.use('/api/*', (req, res) => {
   res.redirect(301, `/${req.params[0]}`)
