@@ -6,14 +6,20 @@ const app = express()
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 const passwordless = require('passwordless');
-const mongoStore = require('passwordless-mongostore');
+const passwordlessMongoStore = require('passwordless-mongostore');
 
 mongoose.connect(process.env.MONGODB_URI)
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cors())
 
 let sess = {
   secret: process.env.EXPRESS_SESSION_SECRET,
   cookie: {},
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
+  store: new MongoStore({ mongooseConnection: mongoose.connection }), 
+  resave: true, 
+  saveUninitialized: true
 }
 // extra security in production environment
 if (process.env.NODE_ENV === 'production') {
@@ -22,18 +28,30 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use(session(sess))
 
-passwordless.init(new MongoStore(process.env.MONGODB_URI));
+passwordless.init(new passwordlessMongoStore(process.env.MONGODB_URI));
 passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
-  const host = 'http://localhost:3000';
-  console.log(`${host}/?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`);
-  var host = 'localhost:3000';
+  const domain = 'http://localhost:3000';
+  console.log(`${domain}/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`);
 });
 
-const discordBot = require('./app/controllers/discordBot')
+app
+  .get('/callback', passwordless.acceptToken({ successRedirect: 'https://google.com' }));
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(cors())
+app
+  .post('/sendtoken', passwordless.requestToken(
+    async function(user, delivery, callback, req) {
+      const attendee = await Attendee.findOne({ email: user }).exec()
+      if (attendee) {
+        callback(null, attendee.id);
+      } else {
+        callback(null, null);
+      }
+    }
+  ), function (req, res) {
+    res.status(200).json({ message: 'Token sent, please check your email.' })
+  })
+
+const discordBot = require('./app/controllers/discordBot')
 
 const port = process.env.PORT || 3000
 
@@ -41,24 +59,17 @@ app.get('/', (req, res) => {
   res.redirect(302, 'https://hackchicago.io')
 })
 
-app.post('/login',
-  passport.authenticate('local'),
-  function(req, res) {
-    // If this function gets called, authentication was successful.
-    // `req.user` contains the authenticated user.
-    res.redirect('/users/' + req.user.username);
-  });
-
 app.use('/api/*', (req, res) => {
   res.redirect(301, `/${req.params[0]}`)
 })
 app.use('/v1/*', (req, res, next) => {
-  if (req.get('Auth') === process.env.AUTH_KEY) {
+  /*if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
     next()
   } else {
     res.status(403).json({ message: 'Please authenticate.' })
-  }
+  }*/
+  next()
 })
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
