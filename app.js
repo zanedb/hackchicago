@@ -19,6 +19,7 @@ app.get('/', (req, res) => {
 app.use('/api/*', (req, res) => {
   res.redirect(301, `/${req.params[0]}`)
 })
+//app.use('/v1/signatures', require('./app/controllers/v1/signatures'))
 app.use('/v1/*', (req, res, next) => {
   if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
