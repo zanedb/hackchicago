@@ -9,21 +9,28 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 passwordless.init(new passwordlessMongoStore(process.env.MONGODB_URI))
 passwordless.addDelivery(async function(tokenToSend, uidToSend, recipient, callback) {
-  const domain = 'http://localhost:3000'
-  const loginLink = `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`;
-  const msg = {
-    to: recipient,
-    from: {
-      name: 'Hack Chicago Team',
-      email: 'no-reply@hackchicago.io',
-    },
-    subject: 'Hack Chicago Magic Login Link',
-    html: `Hi,<br>Somebody (hopefully you!) requested a login link for <a href="https://app.hackchicago.io">Hack Chicago</a>.<br><br>To login, please click below:<br><a href="${loginLink}">Magic Login Link</a><br><br>Thank you!`,
-  };
-  try {
-    await sgMail.send(msg);
+  if (process.env.NODE_ENV === 'production') {
+    const domain = 'https://api.hackchicago.io'
+    const loginLink = `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`;
+    const msg = {
+      to: recipient,
+      from: {
+        name: 'Hack Chicago Team',
+        email: 'no-reply@hackchicago.io',
+      },
+      subject: 'Hack Chicago Magic Login Link',
+      html: `Hi,<br>Somebody (hopefully you!) requested a login link for <a href="https://app.hackchicago.io">Hack Chicago</a>.<br><br>To login, please click below:<br><a href="${loginLink}">Magic Login Link</a><br><br>Thank you!`,
+    };
+    try {
+      await sgMail.send(msg);
+      callback()
+    } catch (e) {}
+  } else {
+    const domain = 'http://localhost:3000'
+    const loginLink = `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`;
+    console.log(`Link: ${loginLink}`)
     callback()
-  } catch (e) {}
+  }
 })
 
 router.route('/sendtoken').post(
