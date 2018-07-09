@@ -7,7 +7,8 @@ const passwordlessMongoStore = require('passwordless-mongostore');
 passwordless.init(new passwordlessMongoStore(process.env.MONGODB_URI));
 passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
   const domain = 'http://localhost:3000';
-  console.log(`${domain}/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`);
+  console.log(`${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`);
+  callback()
 });
 
 router
@@ -27,6 +28,18 @@ router
 
 router
   .route('/callback')
-  .get(passwordless.acceptToken({ successRedirect: 'https://google.com' }));
+  .get(passwordless.acceptToken({ successRedirect: '/v1/auth/success', failureRedirect: '/v1/auth/failure' }));
+
+router
+  .route('/success')
+  .get(function(req, res) {
+    res.status(200).json({ message: 'Authenticated!' })
+  })
+
+router
+  .route('/failure')
+  .get(function(req, res) {
+    res.status(200).json({ message: 'Authentication failed.' })
+  })
 
 module.exports = router
