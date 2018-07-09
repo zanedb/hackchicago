@@ -54,7 +54,6 @@ app.use('/v1/*', async (req, res, next) => {
 
       next()
     } else {
-      req.loggedIn = false
       res.status(401).json({ message: 'You are not an attendee or organizer.' })
     }
   } else {

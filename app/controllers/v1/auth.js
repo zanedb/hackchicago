@@ -29,14 +29,12 @@ router.route('/sendtoken').post(
   }
 )
 
-router
-  .route('/callback')
-  .get(
-    passwordless.acceptToken({
-      successRedirect: '/v1/auth/success',
-      failureRedirect: '/v1/auth/failure'
-    })
-  )
+router.route('/callback').get(
+  passwordless.acceptToken({
+    successRedirect: '/v1/auth/success',
+    failureRedirect: '/v1/auth/failure'
+  })
+)
 
 router.route('/success').get(function(req, res) {
   res.status(200).json({ message: 'Authenticated!' })
