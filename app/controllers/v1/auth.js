@@ -1,18 +1,29 @@
 const Attendee = require('../../models/attendee')
 const express = require('express')
-const router = express.Router()
 const passwordless = require('passwordless')
 const passwordlessMongoStore = require('passwordless-mongostore')
+const router = express.Router()
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 passwordless.init(new passwordlessMongoStore(process.env.MONGODB_URI))
-passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
+passwordless.addDelivery(async function(tokenToSend, uidToSend, recipient, callback) {
   const domain = 'http://localhost:3000'
-  console.log(
-    `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(
-      uidToSend
-    )}`
-  )
-  callback()
+  const loginLink = `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`;
+  const msg = {
+    to: recipient,
+    from: {
+      name: 'Hack Chicago Team',
+      email: 'no-reply@hackchicago.io',
+    },
+    subject: 'Hack Chicago Magic Login Link',
+    html: `Hi,<br>Somebody (hopefully you!) requested a login link for <a href="https://app.hackchicago.io">Hack Chicago</a>.<br><br>To login, please click below:<br><a href="${loginLink}">Magic Login Link</a><br><br>Thank you!`,
+  };
+  try {
+    await sgMail.send(msg);
+    callback()
+  } catch (e) {}
 })
 
 router.route('/sendtoken').post(
