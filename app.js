@@ -46,14 +46,17 @@ app.use('/v1/*', async (req, res, next) => {
     res.status(403).json({ message: 'Please authenticate.' })
   }*/
   if (req.user) {
-    req.loggedIn = true
-
     const attendee = await Attendee.findOne({ email: req.user }).exec()
     if (attendee) {
       attendee.isAdmin ? (req.isAdmin = true) : (req.isAdmin = false)
       req.userObject = attendee
+      req.loggedIn = true
+
+      next()
+    } else {
+      req.loggedIn = false
+      res.status(401).json({ message: 'You are not an attendee or organizer.' })
     }
-    next()
   } else {
     req.loggedIn = false
     req.isAdmin = false
