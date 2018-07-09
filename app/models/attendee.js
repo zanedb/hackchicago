@@ -19,7 +19,8 @@ const AttendeeSchema = new Schema({
   gender: String,
   discordId: String,
   hasRegistered: Boolean,
-  isApproved: Boolean
+  isApproved: false,
+  isAdmin: false
 })
 
 module.exports = mongoose.model('Attendee', AttendeeSchema)

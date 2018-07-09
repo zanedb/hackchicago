@@ -7,39 +7,47 @@ const { notifyStat } = require('../discordBot')
 router
   .route('/')
   .get(async (req, res) => {
-    const projects = await Project.find().exec()
-    res.json(projects)
+    if (req.loggedIn) {
+      const projects = await Project.find().exec()
+      res.json(projects)
+    } else {
+      res.sendStatus(401)
+    }
   })
   // Create a project
   .post(async (req, res) => {
-    try {
-      const projectResult = await Project.findOne({
-        name: req.body.name
-      }).exec()
-      if (!projectResult) {
-        const project = new Project()
-        project.name = req.body.name
-        // TODO: Require email to be logged in email
-        // TODO: Add login system
-        project.submitter = { email: req.body.email, id: req.body.id }
-        project.tagline = req.body.tagline
-        project.description = req.body.description
-        project.timestamp = `${new Date().getMonth() +
-          1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
+    if (req.loggedIn) {
+      try {
+        const projectResult = await Project.findOne({
+          name: req.body.name
+        }).exec()
+        if (!projectResult) {
+          const project = new Project()
+          project.name = req.body.name
+          // TODO: Require email to be logged in email
+          // TODO: Add login system
+          project.submitter = { email: req.body.email, id: req.body.id }
+          project.tagline = req.body.tagline
+          project.description = req.body.description
+          project.timestamp = `${new Date().getMonth() +
+            1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
 
-        await project.save()
-        res.json({ message: 'Project created!' })
-        notifyStat(
-          `API: SUCCESS created PROJECT with NAME ${req.body.name}, by EMAIL ${
-            project.submitter.email
-          }`
-        )
-      } else {
-        res
-          .status(400)
-          .json({ message: 'Project with that name already exists' })
-      }
-    } catch (e) {}
+          await project.save()
+          res.json({ message: 'Project created!' })
+          notifyStat(
+            `API: SUCCESS created PROJECT with NAME ${
+              req.body.name
+            }, by EMAIL ${project.submitter.email}`
+          )
+        } else {
+          res
+            .status(400)
+            .json({ message: 'Project with that name already exists' })
+        }
+      } catch (e) {}
+    } else {
+      res.sendStatus(401)
+    }
   })
 
 module.exports = router

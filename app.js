@@ -1,3 +1,4 @@
+const Attendee = require('./app/models/attendee')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const express = require('express')
@@ -15,8 +16,8 @@ app.use(cors())
 let sess = {
   secret: process.env.EXPRESS_SESSION_SECRET,
   cookie: {},
-  store: new MongoStore({ mongooseConnection: mongoose.connection }), 
-  resave: true, 
+  store: new MongoStore({ mongooseConnection: mongoose.connection }),
+  resave: true,
   saveUninitialized: true
 }
 // extra security in production environment
@@ -37,14 +38,27 @@ app.get('/', (req, res) => {
 app.use('/api/*', (req, res) => {
   res.redirect(301, `/${req.params[0]}`)
 })
-app.use('/v1/*', (req, res, next) => {
+app.use('/v1/*', async (req, res, next) => {
   /*if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
     next()
   } else {
     res.status(403).json({ message: 'Please authenticate.' })
   }*/
-  next()
+  if (req.user) {
+    req.loggedIn = true
+
+    const attendee = await Attendee.findOne({ email: req.user }).exec()
+    if (attendee) {
+      attendee.isAdmin ? (req.isAdmin = true) : (req.isAdmin = false)
+      req.userObject = attendee
+    }
+    next()
+  } else {
+    req.loggedIn = false
+    req.isAdmin = false
+    next()
+  }
 })
 app.use('/v1/auth', require('./app/controllers/v1/auth'))
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
