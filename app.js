@@ -5,8 +5,6 @@ const mongoose = require('mongoose')
 const app = express()
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
-const passwordless = require('passwordless');
-const passwordlessMongoStore = require('passwordless-mongostore');
 
 mongoose.connect(process.env.MONGODB_URI)
 
@@ -28,29 +26,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use(session(sess))
 
-passwordless.init(new passwordlessMongoStore(process.env.MONGODB_URI));
-passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
-  const domain = 'http://localhost:3000';
-  console.log(`${domain}/callback?token=${tokenToSend}&uid=${encodeURIComponent(uidToSend)}`);
-});
-
-app
-  .get('/callback', passwordless.acceptToken({ successRedirect: 'https://google.com' }));
-
-app
-  .post('/sendtoken', passwordless.requestToken(
-    async function(user, delivery, callback, req) {
-      const attendee = await Attendee.findOne({ email: user }).exec()
-      if (attendee) {
-        callback(null, attendee.id);
-      } else {
-        callback(null, null);
-      }
-    }
-  ), function (req, res) {
-    res.status(200).json({ message: 'Token sent, please check your email.' })
-  })
-
 const discordBot = require('./app/controllers/discordBot')
 
 const port = process.env.PORT || 3000
@@ -71,6 +46,7 @@ app.use('/v1/*', (req, res, next) => {
   }*/
   next()
 })
+app.use('/v1/auth', require('./app/controllers/v1/auth'))
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
 app.use('/v1/referrals', require('./app/controllers/v1/referrals'))
