@@ -1,7 +1,8 @@
 const express = require('express')
 const passport = require('passport')
-const PasswordlessStrategy = require('passport-passwordless').Strategy;
+const PasswordlessStrategy = require('passport-passwordless');
 const router = express.Router()
+
 
 passport.use(new PasswordlessStrategy({ 
   //... configuration ... 
