@@ -9,6 +9,8 @@ const discordBot = require('./app/controllers/discordBot')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
+app.use(passport.initialize());
+app.use(passport.session());
 
 const port = process.env.PORT || 3000
 
