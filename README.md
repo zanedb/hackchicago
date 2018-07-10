@@ -34,5 +34,5 @@
     - Use [this link](https://discord.gg/UE8ZMgr) to join the *TESTING* Discord server
     - To run in testing mode:
       ```
-      nodemon -r dotenv/config app.js
+      yarn dev
       ```
