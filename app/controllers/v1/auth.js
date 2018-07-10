@@ -10,8 +10,8 @@ passport.use(
       tokenLifeTime: 1000 * 60 * 10,
 
       store: {
-        path: __dirname + '/node_modules/passwordless-mongostore',
-        config: [process.env.MONGODB_URI]
+        path: './../../passwordless-mongostore',
+        config: process.env.MONGODB_URI
       },
       delivery: function(options) {
         return function(tokenToSend, uidToSend, recipient, callback, req) {
