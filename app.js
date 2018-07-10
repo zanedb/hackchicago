@@ -42,12 +42,12 @@ app.use('/api/*', (req, res) => {
 })
 app.use('/v1/signatures', require('./app/controllers/v1/signatures'))
 app.use('/v1/*', (req, res, next) => {
-  if (req.get('Auth') === process.env.AUTH_KEY) {
+  /*if (req.get('Auth') === process.env.AUTH_KEY) {
     console.log('Request received..')
     next()
   } else {
     res.status(403).json({ message: 'Please authenticate.' })
-  }
+  }*/
 })
 app.use('/v1/auth', require('./app/controllers/v1/auth'))
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
