@@ -27,7 +27,8 @@
   "scripts": {
     "fmt": "prettier \"{app/**,config/**}/*.js\" \"app.js\" --single-quote --no-semi --write",
     "precommit": "yarn run fmt",
-    "start": "node -r dotenv/config app.js"
+    "start": "node -r dotenv/config app.js",
+    "dev": "nodemon -r dotenv/config app.js"
   },
   "devDependencies": {
     "husk": "^0.5.3",
