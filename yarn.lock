@@ -762,9 +762,9 @@ parseurl@~1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.2.tgz#fc289d4ed8993119460c156253262cdc8de65bf3"
 
-passport-passwordless@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/passport-passwordless/-/passport-passwordless-0.0.1.tgz#74b90613ee39bc757643ffa92b0c99ee2dca5b3e"
+"passport-passwordless@https://github.com/Tschuck/passport-passwordless.git":
+  version "0.0.4"
+  resolved "https://github.com/Tschuck/passport-passwordless.git#9cd8e96181323f40ef80ea05942039965be1722a"
   dependencies:
     bs58 "^3.0.0"
     crypto "0.0.3"
