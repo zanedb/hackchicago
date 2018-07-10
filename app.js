@@ -48,6 +48,7 @@ app.use('/v1/*', (req, res, next) => {
   } else {
     res.status(403).json({ message: 'Please authenticate.' })
   }*/
+  next()
 })
 app.use('/v1/auth', require('./app/controllers/v1/auth'))
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
