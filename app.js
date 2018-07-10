@@ -26,8 +26,8 @@ if (process.env.NODE_ENV === 'production') {
   sess.cookie.secure = true
 }
 app.use(session(sess))
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
 
 const discordBot = require('./app/controllers/discordBot')
 
