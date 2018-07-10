@@ -1,4 +1,5 @@
 const express = require('express')
+const passwordless = require('passwordless')
 const Project = require('../../models/project')
 const router = express.Router()
 const { notifyStat } = require('../discordBot')
@@ -6,13 +7,9 @@ const { notifyStat } = require('../discordBot')
 // Absolute path: /v1/projects
 router
   .route('/')
-  .get(async (req, res) => {
-    if (req.loggedIn) {
-      const projects = await Project.find().exec()
-      res.json(projects)
-    } else {
-      res.sendStatus(401)
-    }
+  .get(passwordless.restricted(), async (req, res) => {
+    const projects = await Project.find().exec()
+    res.json(projects)
   })
   // Create a project
   .post(async (req, res) => {
