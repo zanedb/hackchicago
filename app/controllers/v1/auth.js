@@ -31,7 +31,7 @@ passport.use(
   )
 )
 
-router.post('/login', passport.authenticate('local'), {
+router.post('/login', passport.authenticate('passwordless'), {
   successRedirect: '/',
   failureRedirect: '/login'
 })
