@@ -31,9 +31,9 @@ passport.use(
   )
 )
 
-router.route('/login').post(passport.authenticate('passwordless'), {
+router.route('/login').post(passport.authenticate('passwordless', {
   successRedirect: '/',
   failureRedirect: '/login'
-})
+}))
 
 module.exports = router
