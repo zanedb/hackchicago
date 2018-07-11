@@ -7,6 +7,7 @@ const sgMail = require('@sendgrid/mail')
 function Strategy(options, verify) {
   sgMail.setApiKey(options.sendgridApiKey)
 
+  this._tokenLifeTime = options.tokenLifeTime || 1000 * 60 * 10
   passport.Strategy.call(this)
   this.name = 'token'
 }
@@ -20,15 +21,32 @@ Strategy.prototype.authenticate = async function(req, options) {
 
   const self = this
 
-  // TEMPORARY
-  const authToken = 'abc'
   if (email && token) {
-    if (token === authToken) {
-      console.log(`Email: ${email}, with token: ${token}. VERIFIED`)
-      self.success({ email: email })
-    } else {
-      // invalid token, return 401
-      return self.fail(401)
+    try {
+      const retrievedTokens = await Token.find({
+        email
+      }).exec()
+      let tokenFound = false
+      for (const potentialToken of retrievedTokens) {
+        // check for token expiration + validity
+        if (
+          Date.now() - Date.parse(potentialToken.timestamp) <
+            this._tokenLifeTime &&
+          potentialToken.token === token
+        ) {
+          tokenFound = true
+          break
+        }
+      }
+      await Token.deleteMany({ email }).exec()
+      if (tokenFound) {
+        self.success({ email: email })
+      } else {
+        // invalid token, return 401
+        return self.fail(401)
+      }
+    } catch (ex) {
+      throw new Error(ex)
     }
   } else if (email) {
     // generate + store token
@@ -42,19 +60,25 @@ Strategy.prototype.authenticate = async function(req, options) {
     } catch (ex) {
       throw new Error(ex)
     }
-    const msg = {
-      to: email,
-      from: {
-        email: 'no-reply@hackchicago.io',
-        name: 'Hack Chicago Team',
-      },
-      subject: `Hack Chicago Login Code: ${token}`,
-      html: `Hi,<br/><br/>Somebody (hopefully you!) requested a login code for Hack Chicago.<br/>Your login code is <b>${token}</b>. It will expire in 15 minutes.<br/><br/>- Hack Chicago`
-    }
-    try {
-      sgMail.send(msg)
-    } catch (ex) {
-      throw new Error(ex)
+    if (process.env.NODE_ENV === 'production') {
+      // send token
+      const msg = {
+        to: email,
+        from: {
+          email: 'no-reply@hackchicago.io',
+          name: 'Hack Chicago Team'
+        },
+        subject: `Hack Chicago Login Code: ${token}`,
+        html: `Hi,<br/><br/>Somebody (hopefully you!) requested a login code for Hack Chicago.<br/>Your login code is <b>${token}</b>. It will expire in 15 minutes.<br/><br/>- Hack Chicago`
+      }
+      try {
+        sgMail.send(msg)
+      } catch (ex) {
+        throw new Error(ex)
+      }
+      // if testing, console.log to not waste emails
+    } else {
+      console.log(`Token: ${token}`)
     }
     // token was sent, return 200
     self.fail(200)

@@ -8,7 +8,6 @@ passport.use(
     {
       allowTokenReuse: true,
       tokenLifeTime: 1000 * 60 * 10,
-      storeUri: process.env.MONGODB_URI,
       sendgridApiKey: process.env.SENDGRID_API_KEY
     },
     function(req, user, done) {
