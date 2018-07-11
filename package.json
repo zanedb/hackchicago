@@ -20,8 +20,7 @@
     "express-session": "^1.15.6",
     "mongoose": "^5.1.5",
     "passport": "^0.4.0",
-    "passport-passwordless": "https://github.com/Tschuck/passport-passwordless.git",
-    "passwordless-mongostore": "^0.1.4",
+    "passport-strategy": "^1.0.0",
     "request": "^2.87.0"
   },
   "scripts": {
