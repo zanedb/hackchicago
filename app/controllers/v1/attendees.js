@@ -20,8 +20,6 @@ router
         Object.entries(req.body).forEach(([key, value]) => {
           attendee[key] = value
         })
-        attendee.hasRegistered = false
-        attendee.isApproved = false
 
         await attendee.save()
         res.json({ message: 'Attendee created!' })
