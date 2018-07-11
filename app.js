@@ -50,7 +50,7 @@ app.use('/v1/*', (req, res, next) => {
   }*/
   next()
 })
-app.use('/v1/auth', require('./app/controllers/v1/auth'))
+app.use('/auth', require('./app/controllers/auth/auth'))
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
 app.use('/v1/referrals', require('./app/controllers/v1/referrals'))
