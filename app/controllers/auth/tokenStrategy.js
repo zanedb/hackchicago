@@ -2,15 +2,18 @@ const Token = require('../../models/token')
 const crypto = require('crypto')
 const passport = require('passport-strategy')
 const util = require('util')
+const sgMail = require('@sendgrid/mail')
 
 function Strategy(options, verify) {
+  sgMail.setApiKey(options.sendgridApiKey)
+
   passport.Strategy.call(this)
   this.name = 'token'
 }
 
 util.inherits(Strategy, passport.Strategy)
 
-Strategy.prototype.authenticate = function(req, options) {
+Strategy.prototype.authenticate = async function(req, options) {
   options = options || {}
   const email = req.body.email
   const token = req.body.token
@@ -28,8 +31,31 @@ Strategy.prototype.authenticate = function(req, options) {
       return self.fail(401)
     }
   } else if (email) {
-    // generate token
-    console.log(`Token: ${cryptoRandomNumber(100000, 999999)}`);
+    // generate + store token
+    const token = cryptoRandomNumber(100000, 999999)
+    const storedToken = new Token()
+    storedToken.email = email
+    storedToken.token = token
+    storedToken.timestamp = new Date().toISOString()
+    try {
+      await storedToken.save()
+    } catch (ex) {
+      throw new Error(ex)
+    }
+    const msg = {
+      to: email,
+      from: {
+        email: 'no-reply@hackchicago.io',
+        name: 'Hack Chicago Team',
+      },
+      subject: `Hack Chicago Login Code: ${token}`,
+      html: `Hi,<br/><br/>Somebody (hopefully you!) requested a login code for Hack Chicago.<br/>Your login code is <b>${token}</b>. It will expire in 15 minutes.<br/><br/>- Hack Chicago`
+    }
+    try {
+      sgMail.send(msg)
+    } catch (ex) {
+      throw new Error(ex)
+    }
     // token was sent, return 200
     self.fail(200)
   } else {
@@ -38,17 +64,17 @@ Strategy.prototype.authenticate = function(req, options) {
   }
 }
 
-function cryptoRandomNumber(min, max){
-  const distance = max - min;
-	const maxBytes = 3;
-  const maxDec = 16777216;
-  
-	const randbytes = parseInt(crypto.randomBytes(maxBytes).toString('hex'), 16);
-	let result = Math.floor(randbytes/maxDec*(max-min+1)+min);
+function cryptoRandomNumber(min, max) {
+  const distance = max - min
+  const maxBytes = 3
+  const maxDec = 16777216
 
-  if(result>max) result = max;
-  
-	return result;
+  const randbytes = parseInt(crypto.randomBytes(maxBytes).toString('hex'), 16)
+  let result = Math.floor((randbytes / maxDec) * (max - min + 1) + min)
+
+  if (result > max) result = max
+
+  return result
 }
 
 module.exports = Strategy
