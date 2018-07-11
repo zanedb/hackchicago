@@ -22,19 +22,16 @@ Strategy.prototype.authenticate = function(req, options) {
       console.log(`Email: ${email}, with token: ${token}. VERIFIED`)
       self.success({ email: email })
     } else {
-      return this.fail(
-        { message: options.invalidTokenMessage || 'Invalid token' },
-        401
-      )
+      // invalid token, return 401
+      return self.fail(401)
     }
   } else if (email) {
     console.log(`TOKEN is ${authToken}`)
-    self.fail({ message: 'Check your email!' }, 200)
+    // token was sent, return 200
+    self.fail(200)
   } else {
-    self.fail(
-      { message: options.badOptionsMessage || 'Missing credentials' },
-      400
-    )
+    // invalid request, return 400
+    self.fail(400)
   }
 }
 
