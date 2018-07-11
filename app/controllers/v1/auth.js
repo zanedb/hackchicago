@@ -31,9 +31,17 @@ passport.use(
   )
 )
 
-router.route('/login').post(passport.authenticate('passwordless', {
-  successRedirect: '/',
-  failureRedirect: '/login'
+router.route('/').post(passport.authenticate('passwordless', {
+  successRedirect: '/v1/auth/success',
+  failureRedirect: '/v1/auth/failure'
 }))
+
+router.route('/success').get(function(req, res) {
+  res.status(200).json({ message: 'Authenticated!' })
+})
+
+router.route('/failure').get(function(req, res) {
+  res.status(200).json({ message: 'Authentication failed.' })
+})
 
 module.exports = router
