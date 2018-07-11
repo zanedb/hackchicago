@@ -13,8 +13,8 @@ passport.use(
         path: './../../passwordless-mongostore',
         config: process.env.MONGODB_URI
       },
-      delivery: function(options) {
-        return function(tokenToSend, uidToSend, recipient, callback, req) {
+      delivery: options => {
+        return (tokenToSend, uidToSend, recipient, callback, req) => {
           const domain = 'http://localhost:3000'
           const loginLink = `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(
             uidToSend
@@ -24,7 +24,7 @@ passport.use(
         }
       }
     },
-    function(req, user, done) {
+    (req, user, done) => {
       //.. validate the logged in user and build your final user object
       return done(null, user)
     }
@@ -36,11 +36,11 @@ router.route('/').post(passport.authenticate('passwordless', {
   failureRedirect: '/v1/auth/failure'
 }))
 
-router.route('/success').get(function(req, res) {
+router.route('/success').get((req, res) => {
   res.status(200).json({ message: 'Authenticated!' })
 })
 
-router.route('/failure').get(function(req, res) {
+router.route('/failure').get((req, res) => {
   res.status(200).json({ message: 'Authentication failed.' })
 })
 

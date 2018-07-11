@@ -3,7 +3,7 @@ const router = express.Router()
 const request = require('request')
 const { notifyStat } = require('../discordBot')
 
-router.route('/').post(function(req, res) {
+router.route('/').post((req, res) => {
   // temporary redirect
   res.redirect(
     302,
