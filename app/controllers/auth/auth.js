@@ -7,7 +7,7 @@ passport.use(
   new TokenStrategy(
     {
       allowTokenReuse: true,
-      tokenLifeTime: 1000 * 60 * 10,
+      tokenLifeTime: 1000 * 60 * 15,
       sendgridApiKey: process.env.SENDGRID_API_KEY
     },
     function(req, user, done) {
