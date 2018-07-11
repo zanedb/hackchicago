@@ -9,16 +9,7 @@ passport.use(
       allowTokenReuse: true,
       tokenLifeTime: 1000 * 60 * 10,
       storeUri: process.env.MONGODB_URI,
-      delivery: function(options) {
-        return function(tokenToSend, uidToSend, recipient, callback, req) {
-          const domain = 'http://localhost:3000'
-          const loginLink = `${domain}/v1/auth/callback?token=${tokenToSend}&uid=${encodeURIComponent(
-            uidToSend
-          )}`
-          console.log(`Link: ${loginLink}`)
-          callback()
-        }
-      }
+      sendgridApiKey: process.env.SENDGRID_API_KEY
     },
     function(req, user, done) {
       //.. validate the logged in user and build your final user object
