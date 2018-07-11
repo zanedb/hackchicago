@@ -50,8 +50,16 @@ app.use('/v1/*', async (req, res, next) => {
     res.status(401).json({ message: 'Please authenticate.' })
   }
 })
-app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
+app.use('/v1/*', async (req, res, next) => {
+  // only allow admin users to access other endpoints
+  if (req.user.isAdmin) {
+    next()
+  } else {
+    res.status(401).json({ message: 'You do not have access.' })
+  }
+})
+app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
 app.use('/v1/referrals', require('./app/controllers/v1/referrals'))
 
 app.listen(port, () => {
