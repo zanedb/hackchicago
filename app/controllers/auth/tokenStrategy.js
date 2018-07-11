@@ -1,3 +1,4 @@
+const Attendee = require('./../../models/attendee')
 const Token = require('../../models/token')
 const crypto = require('crypto')
 const passport = require('passport-strategy')
@@ -40,7 +41,12 @@ Strategy.prototype.authenticate = async function(req, options) {
       }
       await Token.deleteMany({ email }).exec()
       if (tokenFound) {
-        self.success({ email: email })
+        const attendee = await Attendee.findOne({ email }).exec()
+        if (attendee) {
+          self.success(attendee)
+        } else {
+          self.fail(401)
+        }
       } else {
         // invalid token, return 401
         return self.fail(401)
@@ -76,8 +82,8 @@ Strategy.prototype.authenticate = async function(req, options) {
       } catch (ex) {
         throw new Error(ex)
       }
-      // if testing, console.log to not waste emails
     } else {
+      // if testing, console.log to not waste emails
       console.log(`Token: ${token}`)
     }
     // token was sent, return 200
