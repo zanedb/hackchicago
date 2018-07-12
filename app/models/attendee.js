@@ -18,11 +18,12 @@ const AttendeeSchema = new Schema({
   dietRestrictions: String,
   gender: String,
   discordId: String,
-  hasRegistered: Boolean,
-  isApproved: Boolean,
+  hasRegistered: { type: Boolean, default: false },
+  isApproved: { type: Boolean, default: false },
   parentName: String,
   parentPhone: String,
-  parentEmail: String
+  parentEmail: String,
+  role: { type: String, default: 'attendee' }
 })
 
 module.exports = mongoose.model('Attendee', AttendeeSchema)

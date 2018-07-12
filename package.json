@@ -11,18 +11,24 @@
     "npm": "*"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "body-parser": "^1.18.3",
+    "connect-mongo": "^2.0.1",
     "cors": "^2.8.4",
     "discord.js": "^11.3.2",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "mongoose": "^5.1.5",
+    "passport": "^0.4.0",
+    "passport-strategy": "^1.0.0",
     "request": "^2.87.0"
   },
   "scripts": {
     "fmt": "prettier \"{app/**,config/**}/*.js\" \"app.js\" --single-quote --no-semi --write",
     "precommit": "yarn run fmt",
-    "start": "node -r dotenv/config app.js"
+    "start": "node -r dotenv/config app.js",
+    "dev": "nodemon -r dotenv/config app.js"
   },
   "devDependencies": {
     "husk": "^0.5.3",

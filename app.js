@@ -3,12 +3,42 @@ const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
+const session = require('express-session')
+const MongoStore = require('connect-mongo')(session)
+const passport = require('passport')
 
-const discordBot = require('./app/controllers/discordBot')
+mongoose.connect(process.env.MONGODB_URI)
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(cors())
+app.use(
+  cors({
+    origin: [
+      'https://app.hackchicago.io',
+      'https://hackchicago.io',
+      'http://localhost:3000'
+    ],
+    credentials: true
+  })
+)
+
+let sess = {
+  secret: process.env.EXPRESS_SESSION_SECRET,
+  cookie: {},
+  store: new MongoStore({ mongooseConnection: mongoose.connection }),
+  resave: true,
+  saveUninitialized: true
+}
+// extra security in production environment
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1)
+  sess.cookie.secure = true
+}
+app.use(session(sess))
+app.use(passport.initialize())
+app.use(passport.session())
+
+const discordBot = require('./app/controllers/discordBot')
 
 const port = process.env.PORT || 3000
 
@@ -19,20 +49,27 @@ app.get('/', (req, res) => {
 app.use('/api/*', (req, res) => {
   res.redirect(301, `/${req.params[0]}`)
 })
-app.use('/v1/signatures', require('./app/controllers/v1/signatures'))
+app.use('/v1/zapier', require('./app/controllers/v1/zapier'))
+app.use('/auth', require('./app/controllers/auth/auth'))
 app.use('/v1/*', (req, res, next) => {
-  if (req.get('Auth') === process.env.AUTH_KEY) {
-    console.log('Request received..')
+  // only allow authenticated users to access API
+  if (req.user) {
     next()
   } else {
-    res.status(403).json({ message: 'Please authenticate.' })
+    res.status(401).json({ message: 'Please authenticate.' })
+  }
+})
+app.use('/v1/projects', require('./app/controllers/v1/projects'))
+app.use('/v1/*', (req, res, next) => {
+  // only allow admin users to access other endpoints
+  if (req.user.role === 'admin') {
+    next()
+  } else {
+    res.status(401).json({ message: 'You do not have access.' })
   }
 })
 app.use('/v1/attendees', require('./app/controllers/v1/attendees'))
-app.use('/v1/projects', require('./app/controllers/v1/projects'))
 app.use('/v1/referrals', require('./app/controllers/v1/referrals'))
-
-mongoose.connect(process.env.MONGODB_URI)
 
 app.listen(port, () => {
   console.log(`Express server is running on port ${port}`)
