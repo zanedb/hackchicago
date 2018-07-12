@@ -53,7 +53,7 @@ app.use('/v1/*', async (req, res, next) => {
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
 app.use('/v1/*', async (req, res, next) => {
   // only allow admin users to access other endpoints
-  if (req.user.isAdmin) {
+  if (req.user.role === 'admin') {
     next()
   } else {
     res.status(401).json({ message: 'You do not have access.' })
