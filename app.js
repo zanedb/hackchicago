@@ -11,7 +11,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(cors())
+app.use(cors({ origin: ['https://app.hackchicago.io', 'https://hackchicago.io', 'http://localhost:3000'], credentials: true }))
 
 let sess = {
   secret: process.env.EXPRESS_SESSION_SECRET,
