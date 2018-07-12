@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 app.use('/api/*', (req, res) => {
   res.redirect(301, `/${req.params[0]}`)
 })
-app.use('/v1/signatures', require('./app/controllers/v1/signatures'))
+app.use('/v1/zapier', require('./app/controllers/v1/zapier'))
 app.use('/auth', require('./app/controllers/auth/auth'))
 app.use('/v1/*', async (req, res, next) => {
   // only allow authenticated users to access API
