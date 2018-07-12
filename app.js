@@ -65,8 +65,3 @@ app.use('/v1/referrals', require('./app/controllers/v1/referrals'))
 app.listen(port, () => {
   console.log(`Express server is running on port ${port}`)
 })
-
-process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)
-  // application specific logging, throwing an error, or other logic here
-})
