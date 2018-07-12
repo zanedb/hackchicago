@@ -16,6 +16,7 @@ app.use(
     origin: [
       'https://app.hackchicago.io',
       'https://hackchicago.io',
+      'https://hackchicago-dashboard.netlify.com',
       'http://localhost:3000'
     ],
     credentials: true
