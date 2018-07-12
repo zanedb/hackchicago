@@ -2,6 +2,7 @@ const express = require('express')
 const passport = require('passport')
 const TokenStrategy = require('./tokenStrategy')
 const router = express.Router()
+const Attendee = require('../../models/attendee')
 
 passport.use(
   new TokenStrategy(
@@ -19,11 +20,20 @@ passport.use(
 )
 
 passport.serializeUser(function(user, done) {
-  done(null, user)
+  done(null, user.id)
 })
 
-passport.deserializeUser(function(user, done) {
-  done(null, user)
+passport.deserializeUser(async function(user, done) {
+  try {
+    const attendee = await Attendee.findById(user).exec()
+    if (attendee) {
+      done(null, attendee)
+    } else {
+      done(null, null)
+    }
+  } catch(ex) {
+    throw new Error(ex)
+  }
 })
 
 router.route('/').post(
