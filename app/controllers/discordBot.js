@@ -78,8 +78,8 @@ client.on('message', async msg => {
           { email: attendeeEmail },
           { hasRegistered: true, discordId: msg.author.id },
           async (err, raw) => {
-            // if attendee data is saved, register user on server
-            if (raw.ok) {
+            // if attendee data is saved (and attendee is not an admin!), register user on server
+            if (raw.ok && attendee.role !== 'admin') {
               await registerUser(attendee, msg.author.id, msg.channel)
             } else {
               msg.channel.send(
@@ -144,7 +144,7 @@ process.on('uncaughtException', ex => {
 
 function notifyStat(message) {
   const guild = client.guilds.get(discord.server)
-  const orgChannel = guild.channels.get(discord.channel.stat)
+  const orgChannel = guild. channels.get(discord.channel.stat)
 
   orgChannel.send(message)
   console.log(`stat: ${message}`)
