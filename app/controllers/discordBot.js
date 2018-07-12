@@ -144,7 +144,7 @@ process.on('uncaughtException', ex => {
 
 function notifyStat(message) {
   const guild = client.guilds.get(discord.server)
-  const orgChannel = guild. channels.get(discord.channel.stat)
+  const orgChannel = guild.channels.get(discord.channel.stat)
 
   orgChannel.send(message)
   console.log(`stat: ${message}`)
