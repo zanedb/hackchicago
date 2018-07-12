@@ -31,7 +31,7 @@ passport.deserializeUser(async function(user, done) {
     } else {
       done(null, null)
     }
-  } catch(ex) {
+  } catch (ex) {
     throw new Error(ex)
   }
 })

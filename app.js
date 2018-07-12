@@ -42,7 +42,7 @@ app.use('/api/*', (req, res) => {
 })
 app.use('/v1/zapier', require('./app/controllers/v1/zapier'))
 app.use('/auth', require('./app/controllers/auth/auth'))
-app.use('/v1/*', async (req, res, next) => {
+app.use('/v1/*', (req, res, next) => {
   // only allow authenticated users to access API
   if (req.user) {
     next()
@@ -51,7 +51,7 @@ app.use('/v1/*', async (req, res, next) => {
   }
 })
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
-app.use('/v1/*', async (req, res, next) => {
+app.use('/v1/*', (req, res, next) => {
   // only allow admin users to access other endpoints
   if (req.user.role === 'admin') {
     next()
@@ -64,4 +64,9 @@ app.use('/v1/referrals', require('./app/controllers/v1/referrals'))
 
 app.listen(port, () => {
   console.log(`Express server is running on port ${port}`)
+})
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)
+  // application specific logging, throwing an error, or other logic here
 })
