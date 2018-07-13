@@ -61,6 +61,7 @@ app.use('/v1/*', (req, res, next) => {
   }
 })
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
+app.use('/v1/me', require('./app/controllers/v1/me'))
 app.use('/v1/*', (req, res, next) => {
   // only allow admin users to access other endpoints
   if (req.user.role === 'admin') {
