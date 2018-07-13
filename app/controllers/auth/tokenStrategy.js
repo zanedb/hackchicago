@@ -39,8 +39,8 @@ Strategy.prototype.authenticate = async function(req, options) {
           break
         }
       }
-      await Token.deleteMany({ email }).exec()
       if (tokenFound) {
+        await Token.deleteMany({ email }).exec()
         const attendee = await Attendee.findOne({ email }).exec()
         if (attendee) {
           self.success(attendee)
