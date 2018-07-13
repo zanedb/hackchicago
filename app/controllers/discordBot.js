@@ -71,15 +71,15 @@ client.on('message', async msg => {
         msg.channel.send('**You are not an attendee.**')
         return
       }
-      // Ensure the attendee hasn't already registered before continuing
-      if (!attendee.hasRegistered) {
+      // Ensure the attendee hasn't already registered (and isn't an admin) before continuing
+      if (!attendee.hasRegistered && attendee.role !== 'admin') {
         // Update attendee to be registered
         Attendee.update(
           { email: attendeeEmail },
           { hasRegistered: true, discordId: msg.author.id },
           async (err, raw) => {
-            // if attendee data is saved (and attendee is not an admin!), register user on server
-            if (raw.ok && attendee.role !== 'admin') {
+            // if attendee data could be saved, register user on server
+            if (raw.ok) {
               await registerUser(attendee, msg.author.id, msg.channel)
             } else {
               msg.channel.send(
