@@ -12,8 +12,6 @@ passport.use(
       sendgridApiKey: process.env.SENDGRID_API_KEY
     },
     function(req, user, done) {
-      //.. validate the logged in user and build your final user object
-      console.log(user)
       return done(null, user)
     }
   )
