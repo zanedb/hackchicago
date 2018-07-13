@@ -17,7 +17,8 @@ app.use(
       'https://app.hackchicago.io',
       'https://hackchicago.io',
       'https://hackchicago-dashboard.netlify.com',
-      'http://localhost:3000'
+      'http://localhost:3000',
+      'http://192.168.1.109:3000'
     ],
     credentials: true
   })
