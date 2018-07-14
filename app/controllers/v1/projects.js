@@ -8,24 +8,41 @@ router
   .route('/')
   .get(async (req, res) => {
     const projects = await Project.find().exec()
-    res.json(projects)
+    let editedProjects = []
+    // don't reveal sensitive info (i.e. email)
+    for (const project of projects) {
+      const editedProject = {
+        name: project.name,
+        tagline: project.tagline,
+        description: project.description,
+        timestamp: project.timestamp,
+        submitter: project.submitter.name
+      }
+      editedProjects.push(editedProject)
+    }
+    res.json(editedProjects)
   })
   // Create a project
   .post(async (req, res) => {
     try {
       const projectResult = await Project.findOne({
-        name: req.body.name
+        submitter: {
+          email: req.user.email,
+          id: req.user.id,
+          name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
+        }
       }).exec()
       if (!projectResult) {
         const project = new Project()
         project.name = req.body.name
-        // TODO: Require email to be logged in email
-        // TODO: Add login system
-        project.submitter = { email: req.body.email, id: req.body.id }
+        project.submitter = {
+          email: req.user.email,
+          id: req.user.id,
+          name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
+        }
         project.tagline = req.body.tagline
         project.description = req.body.description
-        project.timestamp = `${new Date().getMonth() +
-          1}/${new Date().getDate()}/${new Date().getFullYear()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
+        project.timestamp = new Date().toISOString()
 
         await project.save()
         res.json({ message: 'Project created!' })
@@ -35,9 +52,7 @@ router
           }`
         )
       } else {
-        res
-          .status(400)
-          .json({ message: 'Project with that name already exists' })
+        res.status(400).json({ message: 'You have already created a project.' })
       }
     } catch (e) {}
   })
