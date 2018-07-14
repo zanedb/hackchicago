@@ -13,6 +13,7 @@ router
     for (const project of projects) {
       const editedProject = {
         name: project.name,
+        link: project.link,
         tagline: project.tagline,
         description: project.description,
         timestamp: project.timestamp,
@@ -41,6 +42,7 @@ router
           id: req.user.id,
           name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
         }
+        project.link = req.body.link
         project.tagline = req.body.tagline
         project.description = req.body.description
         project.timestamp = new Date().toISOString()
