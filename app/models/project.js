@@ -9,7 +9,7 @@ const ProjectSchema = new Schema({
   tagline: String,
   description: String,
   timestamp: String,
-  upvotes: { type: Object, default: {} }
+  upvotes: { type: Array, default: [] }
 })
 
 module.exports = mongoose.model('Project', ProjectSchema)
