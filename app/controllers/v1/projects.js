@@ -3,6 +3,20 @@ const Project = require('../../models/project')
 const router = express.Router()
 const { notifyStat } = require('../discordBot')
 
+function checkLink(url) {
+  // https://stackoverflow.com/a/14582229
+  const urlRegex = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i'
+  ) // fragment locator
+  return urlRegex.test(url)
+}
+
 // Absolute path: /v1/projects
 router
   .route('/')
@@ -64,24 +78,55 @@ router
   })
 
 // Absolute path: /v1/projects/:project_id
-router.route('/:project_id').get(async (req, res) => {
-  try {
-    const project = await Project.findById(req.params.project_id).exec()
-    // don't reveal sensitive info (i.e. email)
-    const editedProject = {
-      name: project.name,
-      link: project.link,
-      tagline: project.tagline,
-      description: project.description,
-      timestamp: project.timestamp,
-      upvotes: project.upvotes.length,
-      submitter: {
-        name: project.submitter.name
-      },
-      id: project._id
+router
+  .route('/:project_id')
+  .get(async (req, res) => {
+    try {
+      const project = await Project.findById(req.params.project_id).exec()
+      // don't reveal sensitive info (i.e. email)
+      const editedProject = {
+        name: project.name,
+        link: project.link,
+        tagline: project.tagline,
+        description: project.description,
+        timestamp: project.timestamp,
+        upvotes: project.upvotes.length,
+        submitter: {
+          name: project.submitter.name
+        },
+        id: project._id
+      }
+      res.json(editedProject)
+    } catch (e) {}
+  })
+  .put(async (req, res) => {
+    try {
+      const project = await Project.findById(req.params.project_id).exec()
+      if (project.submitter.id === req.user._id.toString()) {
+        if (req.body.link || req.body.tagline || req.body.description) {
+          if (req.body.link && checkLink(req.body.link))
+            project.link = req.body.link
+          if (req.body.tagline) project.tagline = req.body.tagline
+          if (req.body.description) project.description = req.body.description
+
+          await project.save()
+          res.json({ message: 'Project updated!' })
+          notifyStat(
+            `API: SUCCESS updated project with NAME ${project.name}, ID ${
+              req.params.attendee_id
+            }`
+          )
+        } else {
+          res.sendStatus(400)
+        }
+      } else {
+        res
+          .status(401)
+          .json({ message: 'You do not have access to this project.' })
+      }
+    } catch (e) {
+      res.status(400).json({ message: 'Project not updated!' })
     }
-    res.json(editedProject)
-  } catch (e) {}
-})
+  })
 
 module.exports = router
