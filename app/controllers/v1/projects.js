@@ -63,4 +63,25 @@ router
     } catch (e) {}
   })
 
+// Absolute path: /v1/projects/:project_id
+router.route('/:project_id').get(async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.project_id).exec()
+    // don't reveal sensitive info (i.e. email)
+    const editedProject = {
+      name: project.name,
+      link: project.link,
+      tagline: project.tagline,
+      description: project.description,
+      timestamp: project.timestamp,
+      upvotes: project.upvotes.length,
+      submitter: {
+        name: project.submitter.name
+      },
+      id: project._id
+    }
+    res.json(editedProject)
+  } catch (e) {}
+})
+
 module.exports = router
