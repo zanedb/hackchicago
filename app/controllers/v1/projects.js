@@ -1,5 +1,6 @@
 const express = require('express')
 const Project = require('../../models/project')
+const Upvote = require('../../models/upvote')
 const router = express.Router()
 const { notifyStat } = require('../discordBot')
 
@@ -25,13 +26,15 @@ router
     let editedProjects = []
     // don't reveal sensitive info (i.e. email)
     for (const project of projects) {
+      const upvotes = await Upvote.find({ projectId: project._id }).exec()
+      console.log(upvotes)
       const editedProject = {
         name: project.name,
         link: project.link,
         tagline: project.tagline,
         description: project.description,
         timestamp: project.timestamp,
-        upvotes: project.upvotes.length,
+        upvotes: upvotes.length,
         submitter: {
           name: project.submitter.name
         },
@@ -96,6 +99,10 @@ router
   .get(async (req, res) => {
     try {
       const project = await Project.findById(req.params.project_id).exec()
+      const upvotes = await Upvote.find({
+        projectId: req.params.project_id
+      }).exec()
+      console.log(upvotes)
       // don't reveal sensitive info (i.e. email)
       const editedProject = {
         name: project.name,
@@ -103,7 +110,7 @@ router
         tagline: project.tagline,
         description: project.description,
         timestamp: project.timestamp,
-        upvotes: project.upvotes.length,
+        upvotes: upvotes.length,
         submitter: {
           name: project.submitter.name
         },
@@ -148,37 +155,47 @@ router
   .post(async (req, res) => {
     try {
       const project = await Project.findById(req.params.project_id).exec()
-      for (const upvote of project.upvotes) {
-        if (req.user._id.toString() === upvote.id.toString()) {
+      if (project) {
+        const searchedUpvote = await Upvote.find({
+          projectId: req.param.project_id,
+          submitterId: req.user._id.toString()
+        }).exec()
+        if (searchedUpvote.length === 0) {
+          const upvote = new Upvote()
+          upvote.submitterId = req.user._id.toString()
+          upvote.projectId = req.params.project_id
+          upvote.timestamp = new Date().toISOString()
+          await upvote.save()
+          res.json({ message: 'Upvote added' })
+        } else {
           res.status(400).json({ message: 'You have already upvoted this' })
         }
       }
-      const upvote = {
-        id: req.user._id,
-        email: req.user.email
-      }
-      project.upvotes.push(upvote)
-      await project.save()
-      res.json({ message: 'Upvote added' })
-    } catch (e) {}
+    } catch (e) {
+      res.sendStatus(500)
+    }
   })
   .delete(async (req, res) => {
     try {
       const project = await Project.findById(req.params.project_id).exec()
-      let upvoteDeleted = false
-      for (let i = 0; i < project.upvotes.length; i++) {
-        if (req.user._id.toString() === project.upvotes[i].id.toString()) {
-          project.upvotes.splice(i, 1)
-          upvoteDeleted = true
+      if (project) {
+        const searchedUpvote = await Upvote.find({
+          projectId: req.param.project_id,
+          submitterId: req.user._id.toString()
+        }).exec()
+        if (searchedUpvote.length !== 0) {
+          await Upvote.deleteOne({
+            projectId: req.param.project_id,
+            submitterId: req.user._id.toString()
+          }).exec()
+          res.json({ message: 'Upvote removed' })
+        } else {
+          res.status(400).json({ message: 'You have not upvoted this' })
         }
       }
-      if (upvoteDeleted) {
-        await project.save()
-        res.json({ message: 'Upvote removed' })
-      } else {
-        res.json({ message: 'Upvote not found' })
-      }
-    } catch (e) {}
+    } catch (e) {
+      res.sendStatus(500)
+    }
   })
 
 module.exports = router
