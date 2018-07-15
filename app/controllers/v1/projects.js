@@ -27,7 +27,6 @@ router
     // don't reveal sensitive info (i.e. email)
     for (const project of projects) {
       const upvotes = await Upvote.find({ projectId: project._id }).exec()
-      console.log(upvotes)
       const editedProject = {
         name: project.name,
         link: project.link,
@@ -102,7 +101,6 @@ router
       const upvotes = await Upvote.find({
         projectId: req.params.project_id
       }).exec()
-      console.log(upvotes)
       // don't reveal sensitive info (i.e. email)
       const editedProject = {
         name: project.name,
