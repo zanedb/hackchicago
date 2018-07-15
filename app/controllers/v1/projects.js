@@ -43,38 +43,51 @@ router
   })
   // Create a project
   .post(async (req, res) => {
-    try {
-      const projectResult = await Project.findOne({
-        submitter: {
-          email: req.user.email,
-          id: req.user.id,
-          name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
-        }
-      }).exec()
-      if (!projectResult) {
-        const project = new Project()
-        project.name = req.body.name
-        project.submitter = {
-          email: req.user.email,
-          id: req.user.id,
-          name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
-        }
-        project.link = req.body.link
-        project.tagline = req.body.tagline
-        project.description = req.body.description
-        project.timestamp = new Date().toISOString()
+    if (
+      req.body.name &&
+      req.body.link &&
+      checkLink(req.body.link) &&
+      req.body.tagline &&
+      req.body.description &&
+      req.body.timestamp
+    ) {
+      try {
+        const projectResult = await Project.findOne({
+          submitter: {
+            email: req.user.email,
+            id: req.user.id,
+            name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
+          }
+        }).exec()
+        if (!projectResult) {
+          const project = new Project()
+          project.name = req.body.name
+          project.submitter = {
+            email: req.user.email,
+            id: req.user.id,
+            name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
+          }
+          project.link = req.body.link
+          project.tagline = req.body.tagline
+          project.description = req.body.description
+          project.timestamp = new Date().toISOString()
 
-        await project.save()
-        res.json({ message: 'Project created!' })
-        notifyStat(
-          `API: SUCCESS created PROJECT with NAME ${req.body.name}, by EMAIL ${
-            project.submitter.email
-          }`
-        )
-      } else {
-        res.status(400).json({ message: 'You have already created a project.' })
-      }
-    } catch (e) {}
+          await project.save()
+          res.json({ message: 'Project created!' })
+          notifyStat(
+            `API: SUCCESS created PROJECT with NAME ${
+              req.body.name
+            }, by EMAIL ${project.submitter.email}`
+          )
+        } else {
+          res
+            .status(400)
+            .json({ message: 'You have already created a project.' })
+        }
+      } catch (e) {}
+    } else {
+      res.sendStatus(400)
+    }
   })
 
 // Absolute path: /v1/projects/:project_id
