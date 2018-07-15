@@ -142,4 +142,43 @@ router
     }
   })
 
+// Absolute path: /v1/projects/:project_id/upvotes
+router
+  .route('/:project_id/upvotes')
+  .post(async (req, res) => {
+    try {
+      const project = await Project.findById(req.params.project_id).exec()
+      for (const upvote of project.upvotes) {
+        if (req.user._id.toString() === upvote.id.toString()) {
+          res.status(400).json({ message: 'You have already upvoted this' })
+        }
+      }
+      const upvote = {
+        id: req.user._id,
+        email: req.user.email
+      }
+      project.upvotes.push(upvote)
+      await project.save()
+      res.json({ message: 'Upvote added' })
+    } catch (e) {}
+  })
+  .delete(async (req, res) => {
+    try {
+      const project = await Project.findById(req.params.project_id).exec()
+      let upvoteDeleted = false
+      for (let i = 0; i < project.upvotes.length; i++) {
+        if (req.user._id.toString() === project.upvotes[i].id.toString()) {
+          project.upvotes.splice(i, 1)
+          upvoteDeleted = true
+        }
+      }
+      if (upvoteDeleted) {
+        await project.save()
+        res.json({ message: 'Upvote removed' })
+      } else {
+        res.json({ message: 'Upvote not found' })
+      }
+    } catch (e) {}
+  })
+
 module.exports = router

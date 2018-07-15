@@ -23,7 +23,8 @@ const AttendeeSchema = new Schema({
   parentName: String,
   parentPhone: String,
   parentEmail: String,
-  role: { type: String, default: 'attendee' }
+  role: { type: String, default: 'attendee' },
+  upvotes: { type: Array, default: [] }
 })
 
 module.exports = mongoose.model('Attendee', AttendeeSchema)
