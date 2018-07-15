@@ -17,9 +17,11 @@ router
         tagline: project.tagline,
         description: project.description,
         timestamp: project.timestamp,
-        submitter: project.submitter.name,
-        id: project._id,
-        upvotes: project.upvotes.length
+        upvotes: project.upvotes.length,
+        submitter: {
+          name: project.submitter.name
+        },
+        id: project._id
       }
       editedProjects.push(editedProject)
     }

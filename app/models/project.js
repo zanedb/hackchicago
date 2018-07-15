@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const ProjectSchema = new Schema({
   name: String,
+  link: String,
   submitter: Object,
   collaborators: Object,
   tagline: String,
