@@ -18,7 +18,8 @@ router
         description: project.description,
         timestamp: project.timestamp,
         submitter: project.submitter.name,
-        id: project._id
+        id: project._id,
+        upvotes: project.upvotes.length
       }
       editedProjects.push(editedProject)
     }
