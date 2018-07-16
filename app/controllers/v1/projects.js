@@ -64,7 +64,6 @@ router
           const project = new Project()
           project.name = req.body.name
           project.submitter = {
-            email: req.user.email,
             id: req.user.id,
             name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
           }
