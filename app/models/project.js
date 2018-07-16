@@ -5,8 +5,7 @@ const ProjectSchema = new Schema({
   name: String,
   link: String,
   submitter: {
-    id: String,
-    name: String
+    id: String
   },
   collaborators: Object,
   tagline: String,

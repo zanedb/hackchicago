@@ -1,5 +1,6 @@
 const express = require('express')
 const Project = require('../../models/project')
+const Attendee = require('../../models/attendee')
 const Upvote = require('../../models/upvote')
 const router = express.Router()
 const { notifyStat } = require('../discordBot')
@@ -22,26 +23,31 @@ function checkLink(url) {
 router
   .route('/')
   .get(async (req, res) => {
-    const projects = await Project.find().exec()
-    let editedProjects = []
-    // don't reveal sensitive info (i.e. email)
-    for (const project of projects) {
-      const upvotes = await Upvote.find({ projectId: project._id }).exec()
-      const editedProject = {
-        name: project.name,
-        link: project.link,
-        tagline: project.tagline,
-        description: project.description,
-        timestamp: project.timestamp,
-        upvotes: upvotes.length,
-        submitter: {
-          name: project.submitter.name
-        },
-        id: project._id
+    try {
+      const projects = await Project.find().exec()
+      let editedProjects = []
+      // don't reveal sensitive info (i.e. email)
+      for (const project of projects) {
+        const upvotes = await Upvote.find({ projectId: project._id }).exec()
+        const attendee = await Attendee.findById(project.submitter.id).exec()
+        const editedProject = {
+          name: project.name,
+          link: project.link,
+          tagline: project.tagline,
+          description: project.description,
+          timestamp: project.timestamp,
+          upvotes: upvotes.length,
+          submitter: {
+            name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
+          },
+          id: project._id
+        }
+        editedProjects.push(editedProject)
       }
-      editedProjects.push(editedProject)
+      res.json(editedProjects)
+    } catch (error) {
+      console.log(error)
     }
-    res.json(editedProjects)
   })
   // Create a project
   .post(async (req, res) => {
@@ -50,22 +56,19 @@ router
       req.body.link &&
       checkLink(req.body.link) &&
       req.body.tagline &&
-      req.body.description &&
-      req.body.timestamp
+      req.body.description
     ) {
       try {
         const projectResult = await Project.findOne({
           submitter: {
-            id: req.user.id,
-            name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
+            id: req.user.id
           }
         }).exec()
         if (!projectResult) {
           const project = new Project()
           project.name = req.body.name
           project.submitter = {
-            id: req.user.id,
-            name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
+            id: req.user.id
           }
           project.link = req.body.link
           project.tagline = req.body.tagline
@@ -77,7 +80,7 @@ router
           notifyStat(
             `API: SUCCESS created PROJECT with NAME ${
               req.body.name
-            }, by EMAIL ${project.submitter.email}`
+            }, by EMAIL ${req.user.email}`
           )
         } else {
           res
@@ -96,6 +99,7 @@ router
   .get(async (req, res) => {
     try {
       const project = await Project.findById(req.params.project_id).exec()
+      const attendee = await Attendee.findById(project.submitter.id).exec()
       const upvotes = await Upvote.find({
         projectId: req.params.project_id
       }).exec()
@@ -108,7 +112,7 @@ router
         timestamp: project.timestamp,
         upvotes: upvotes.length,
         submitter: {
-          name: project.submitter.name
+          name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
         },
         id: project._id
       }
@@ -120,18 +124,38 @@ router
       const project = await Project.findById(req.params.project_id).exec()
       if (project.submitter.id === req.user._id.toString()) {
         if (req.body.link || req.body.tagline || req.body.description) {
-          if (req.body.link && checkLink(req.body.link))
+          let changed = false
+          if (
+            req.body.link &&
+            checkLink(req.body.link) &&
+            req.body.link !== project.link
+          ) {
             project.link = req.body.link
-          if (req.body.tagline) project.tagline = req.body.tagline
-          if (req.body.description) project.description = req.body.description
+            changed = true
+          }
+          if (req.body.tagline && req.body.tagline !== project.tagline) {
+            project.tagline = req.body.tagline
+            changed = true
+          }
+          if (
+            req.body.description &&
+            req.body.description !== project.description
+          ) {
+            project.description = req.body.description
+            changed = true
+          }
 
-          await project.save()
-          res.json({ message: 'Project updated!' })
-          notifyStat(
-            `API: SUCCESS updated project with NAME ${project.name}, ID ${
-              req.params.attendee_id
-            }`
-          )
+          if (changed) {
+            await project.save()
+            res.json({ message: 'Project updated!' })
+            notifyStat(
+              `API: SUCCESS updated project with NAME ${project.name}, ID ${
+                req.params.attendee_id
+              }`
+            )
+          } else {
+            res.sendStatus(400)
+          }
         } else {
           res.sendStatus(400)
         }
@@ -153,12 +177,13 @@ router
       const project = await Project.findById(req.params.project_id).exec()
       if (project) {
         const searchedUpvote = await Upvote.find({
-          projectId: req.param.project_id,
-          submitterId: req.user._id.toString()
+          projectId: req.params.project_id,
+          submitterId: req.user.id
         }).exec()
+        console.log(searchedUpvote.length)
         if (searchedUpvote.length === 0) {
           const upvote = new Upvote()
-          upvote.submitterId = req.user._id.toString()
+          upvote.submitterId = req.user.id
           upvote.projectId = req.params.project_id
           upvote.timestamp = new Date().toISOString()
           await upvote.save()
@@ -176,13 +201,13 @@ router
       const project = await Project.findById(req.params.project_id).exec()
       if (project) {
         const searchedUpvote = await Upvote.find({
-          projectId: req.param.project_id,
-          submitterId: req.user._id.toString()
+          projectId: req.params.project_id,
+          submitterId: req.user.id
         }).exec()
         if (searchedUpvote.length !== 0) {
           await Upvote.deleteOne({
-            projectId: req.param.project_id,
-            submitterId: req.user._id.toString()
+            projectId: req.params.project_id,
+            submitterId: req.user.id
           }).exec()
           res.json({ message: 'Upvote removed' })
         } else {
