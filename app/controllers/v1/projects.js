@@ -46,7 +46,7 @@ router
       }
       res.json(editedProjects)
     } catch (error) {
-      console.log(error)
+      res.sendStatus(500)
     }
   })
   // Create a project
@@ -180,7 +180,6 @@ router
           projectId: req.params.project_id,
           submitterId: req.user.id
         }).exec()
-        console.log(searchedUpvote.length)
         if (searchedUpvote.length === 0) {
           const upvote = new Upvote()
           upvote.submitterId = req.user.id
