@@ -4,7 +4,10 @@ const Schema = mongoose.Schema
 const ProjectSchema = new Schema({
   name: String,
   link: String,
-  submitter: Object,
+  submitter: {
+    id: String,
+    name: String
+  },
   collaborators: Object,
   tagline: String,
   description: String,

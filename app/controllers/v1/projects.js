@@ -56,7 +56,6 @@ router
       try {
         const projectResult = await Project.findOne({
           submitter: {
-            email: req.user.email,
             id: req.user.id,
             name: `${req.user.fname} ${req.user.lname.charAt(0)}.`
           }
