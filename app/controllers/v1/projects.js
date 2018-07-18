@@ -117,7 +117,9 @@ router
         id: project._id
       }
       res.json(editedProject)
-    } catch (e) {}
+    } catch (e) {
+      res.sendStatus(500)
+    }
   })
   .put(async (req, res) => {
     try {
