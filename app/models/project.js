@@ -11,7 +11,7 @@ const ProjectSchema = new Schema({
   tagline: String,
   description: String,
   timestamp: String,
-  images: [{ url: String }]
+  images: { type: [String], default: [] }
 })
 
 module.exports = mongoose.model('Project', ProjectSchema)
