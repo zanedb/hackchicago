@@ -19,6 +19,7 @@ app.use(
       'https://hackchicago.io',
       'https://hackchicago-dashboard.netlify.com',
       'https://hackchicago-ifvictr.c9users.io',
+      'https://hackchicago-ifvictr.c9users.io:8081',
       'http://localhost:3000',
       'http://192.168.1.109:3000'
     ],
@@ -55,6 +56,13 @@ app.use('/api/*', (req, res) => {
 })
 app.use('/v1/zapier', require('./app/controllers/v1/zapier'))
 app.use('/auth', require('./app/controllers/auth/auth'))
+app.use('/s3', s3Router({
+  bucket: process.env.BUCKETEER_BUCKET_NAME,
+  region: process.env.BUCKETEER_AWS_REGION,
+  signatureVersion: 'v4',
+  headers: { 'Access-Control-Allow-Origin': 'https://hackchicago-ifvictr.c9users.io' },
+  ACL: 'public-read',
+}))
 app.use('/v1/*', (req, res, next) => {
   // only allow authenticated users to access API
   if (req.user) {
@@ -63,12 +71,6 @@ app.use('/v1/*', (req, res, next) => {
     res.status(401).json({ message: 'Please authenticate.' })
   }
 })
-app.use('/v1/attachments', s3Router({
-  bucket: process.env.BUCKETEER_BUCKET_NAME,
-  region: process.env.BUCKETEER_AWS_REGION,
-  headers: { 'Access-Control-Allow-Origin': '*' },
-  ACL: 'public-read',
-}))
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
 app.use('/v1/me', require('./app/controllers/v1/me'))
 app.use('/v1/*', (req, res, next) => {

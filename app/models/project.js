@@ -10,7 +10,8 @@ const ProjectSchema = new Schema({
   collaborators: Object,
   tagline: String,
   description: String,
-  timestamp: String
+  timestamp: String,
+  images: [{ url: String }]
 })
 
 module.exports = mongoose.model('Project', ProjectSchema)
