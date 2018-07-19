@@ -11,7 +11,11 @@ const ProjectSchema = new Schema({
   tagline: String,
   description: String,
   timestamp: String,
-  images: { type: [String], default: [] }
+  images: {
+    type: [String],
+    default: [],
+    validate: arr => arr.length <= 4
+  }
 })
 
 module.exports = mongoose.model('Project', ProjectSchema)
