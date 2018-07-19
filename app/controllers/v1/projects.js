@@ -125,8 +125,17 @@ router
     try {
       const project = await Project.findById(req.params.project_id).exec()
       if (project.submitter.id === req.user._id.toString()) {
-        if (req.body.link || req.body.tagline || req.body.description) {
+        if (
+          req.body.name ||
+          req.body.link ||
+          req.body.tagline ||
+          req.body.description
+        ) {
           let changed = false
+          if (req.body.name && req.body.name !== project.name) {
+            project.name = req.body.name
+            changed = true
+          }
           if (
             req.body.link &&
             checkLink(req.body.link) &&
