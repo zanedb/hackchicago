@@ -1,11 +1,12 @@
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const express = require('express')
-const mongoose = require('mongoose')
-const app = express()
 const session = require('express-session')
-const MongoStore = require('connect-mongo')(session)
+const mongoose = require('mongoose')
 const passport = require('passport')
+const s3Router = require('react-s3-uploader/s3router')
+const MongoStore = require('connect-mongo')(session)
+const app = express()
 
 mongoose.connect(process.env.MONGODB_URI)
 
@@ -62,6 +63,12 @@ app.use('/v1/*', (req, res, next) => {
     res.status(401).json({ message: 'Please authenticate.' })
   }
 })
+app.use('/v1/attachments', s3Router({
+  bucket: process.env.BUCKETEER_BUCKET_NAME,
+  region: process.env.BUCKETEER_AWS_REGION,
+  headers: { 'Access-Control-Allow-Origin': '*' },
+  ACL: 'public-read',
+}))
 app.use('/v1/projects', require('./app/controllers/v1/projects'))
 app.use('/v1/me', require('./app/controllers/v1/me'))
 app.use('/v1/*', (req, res, next) => {
