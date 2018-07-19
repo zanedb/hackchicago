@@ -97,7 +97,9 @@ router
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
       res.json(attendee)
-    } catch (e) {}
+    } catch (e) {
+      res.sendStatus(500)
+    }
   })
   .put(async (req, res) => {
     try {
