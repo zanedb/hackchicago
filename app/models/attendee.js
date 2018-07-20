@@ -23,7 +23,12 @@ const AttendeeSchema = new Schema({
   parentName: String,
   parentPhone: String,
   parentEmail: String,
-  role: { type: String, default: 'attendee' }
+  role: { type: String, default: 'attendee' },
+  waiverStatus: {
+    student: { type: Boolean, default: false },
+    parent: { type: Boolean, default: false }
+  },
+  checkedIn: { type: Boolean, default: false }
 })
 
 module.exports = mongoose.model('Attendee', AttendeeSchema)
