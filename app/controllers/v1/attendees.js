@@ -38,60 +38,6 @@ router
     } catch (e) {}
   })
 
-// Get, update, or delete an attendee by email
-router
-  .route('/email/:attendee_email')
-  .get(async (req, res) => {
-    try {
-      const attendee = await Attendee.findOne({
-        email: req.params.attendee_email
-      }).exec()
-      if (!attendee) {
-        res.status(400).json({ message: 'Invalid email' })
-      } else {
-        res.json(attendee)
-      }
-    } catch (e) {}
-  })
-  .put(async (req, res) => {
-    try {
-      const attendee = await Attendee.findOne({
-        email: req.params.attendee_email
-      }).exec()
-      Object.entries(req.body).forEach(([key, value]) => {
-        attendee[key] = value
-      })
-
-      await attendee.save()
-      res.json({ message: 'Attendee updated!' })
-      notifyStat(
-        `API: SUCCESS updated attendee by EMAIL ${req.params.attendee_email}`
-      )
-    } catch (e) {
-      res.status(400).json({ message: 'Attendee not updated!' })
-    }
-  })
-  .delete(async (req, res) => {
-    try {
-      const attendee = await Attendee.findOne({
-        email: req.params.attendee_email
-      }).exec()
-      if (!attendee) {
-        res.status(400).json({ message: 'Invalid attendee' })
-      } else {
-        const deletedAttendee = await Attendee.remove({
-          email: req.params.attendee_email
-        })
-        res.json({ message: 'Successfully deleted attendee' })
-        notifyStat(
-          `API: SUCCESS deleted attendee by EMAIL ${
-            req.params.attendee_email
-          }, ID ${attendee.id}`
-        )
-      }
-    } catch (e) {}
-  })
-
 // Get, update, or delete an attendee by ID
 router
   .route('/id/:attendee_id')
