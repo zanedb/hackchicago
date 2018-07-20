@@ -1,6 +1,8 @@
 const express = require('express')
 const request = require('request')
 const Attendee = require('../../models/attendee')
+const Upvote = require('../../models/upvote')
+const Project = require('../../models/project')
 const router = express.Router()
 const { notifyStat } = require('../discordBot')
 
@@ -96,7 +98,47 @@ router
   .get(async (req, res) => {
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
-      res.json(attendee)
+      let user = {}
+      const upvotes = await Upvote.find({ submitterId: req.user._id }).exec()
+      if (upvotes.length !== 0) user.upvotes = upvotes
+      const project = await Project.findOne({
+        submitter: {
+          id: req.user.id
+        }
+      }).exec()
+      if (project) {
+        user.project = {
+          id: project._id,
+          name: project.name,
+          link: project.link,
+          tagline: project.tagline,
+          description: project.description,
+          timestamp: project.timestamp
+        }
+      }
+      user.id = attendee._id
+      user.fname = attendee.fname
+      user.lname = attendee.lname
+      user.email = attendee.email
+      user.phone = attendee.phone
+      user.gender = attendee.gender
+      user.state = attendee.state
+      user.city = attendee.city
+      user.school = attendee.school
+      user.grade = attendee.grade
+      user.ref = attendee.ref
+      user.internalNotes = attendee.internalNotes
+      user.shirtSize = attendee.shirtSize
+      user.dietRestrictions = attendee.dietRestrictions
+      user.parentName = attendee.parentName
+      user.parentEmail = attendee.parentEmail
+      user.parentPhone = attendee.parentPhone
+      user.timestamp = attendee.timestamp
+      user.note = attendee.note
+      user.role = attendee.role
+      user.hasRegistered = attendee.hasRegistered
+      user.isApproved = attendee.isApproved
+      res.status(200).json(user)
     } catch (e) {
       res.sendStatus(500)
     }
