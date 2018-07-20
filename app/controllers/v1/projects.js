@@ -1,3 +1,4 @@
+const aws = require('aws-sdk')
 const express = require('express')
 const Project = require('../../models/project')
 const Attendee = require('../../models/attendee')

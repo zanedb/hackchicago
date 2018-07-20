@@ -1,11 +1,12 @@
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const express = require('express')
-const mongoose = require('mongoose')
-const app = express()
 const session = require('express-session')
-const MongoStore = require('connect-mongo')(session)
+const mongoose = require('mongoose')
 const passport = require('passport')
+const s3Router = require('react-s3-uploader/s3router')
+const MongoStore = require('connect-mongo')(session)
+const app = express()
 
 mongoose.connect(process.env.MONGODB_URI)
 
@@ -18,6 +19,7 @@ app.use(
       'https://hackchicago.io',
       'https://hackchicago-dashboard.netlify.com',
       'https://hackchicago-ifvictr.c9users.io',
+      'https://hackchicago-ifvictr.c9users.io:8081',
       'http://localhost:3000',
       'http://192.168.1.109:3000'
     ],
@@ -54,6 +56,13 @@ app.use('/api/*', (req, res) => {
 })
 app.use('/v1/zapier', require('./app/controllers/v1/zapier'))
 app.use('/auth', require('./app/controllers/auth/auth'))
+app.use('/s3', s3Router({
+  bucket: process.env.BUCKETEER_BUCKET_NAME,
+  region: process.env.BUCKETEER_AWS_REGION,
+  signatureVersion: 'v4',
+  headers: { 'Access-Control-Allow-Origin': 'https://hackchicago-ifvictr.c9users.io' },
+  ACL: 'public-read',
+}))
 app.use('/v1/*', (req, res, next) => {
   // only allow authenticated users to access API
   if (req.user) {
