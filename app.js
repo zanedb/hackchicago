@@ -21,8 +21,7 @@ app.use(
       'https://hackchicago-ifvictr.c9users.io',
       'https://hackchicago-ifvictr.c9users.io:8081',
       'http://localhost:3000',
-      'http://192.168.1.109:3000',
-      'http://4e5fc051.ngrok.io/'
+      'http://192.168.1.109:3000'
     ],
     credentials: true
   })
