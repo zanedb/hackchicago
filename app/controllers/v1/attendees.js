@@ -84,6 +84,8 @@ router
       user.role = attendee.role
       user.hasRegistered = attendee.hasRegistered
       user.isApproved = attendee.isApproved
+      user.checkedIn = attendee.checkedIn
+      user.waiverStatus = attendee.waiverStatus
       res.status(200).json(user)
     } catch (e) {
       res.sendStatus(500)
