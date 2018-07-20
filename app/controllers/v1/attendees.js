@@ -45,11 +45,13 @@ router
     try {
       const attendee = await Attendee.findById(req.params.attendee_id).exec()
       let user = {}
-      const upvotes = await Upvote.find({ submitterId: req.user._id }).exec()
+      const upvotes = await Upvote.find({
+        submitterId: req.params.attendee_id
+      }).exec()
       if (upvotes.length !== 0) user.upvotes = upvotes
       const project = await Project.findOne({
         submitter: {
-          id: req.user.id
+          id: req.params.attendee_id
         }
       }).exec()
       if (project) {
@@ -146,6 +148,32 @@ router.route('/id/:attendee_id/approve').get(async (req, res) => {
       }
     )
   } catch (e) {}
+})
+
+router.route('/id/:attendee_id/checkin').post(async (req, res) => {
+  try {
+    const attendee = await Attendee.findById(req.params.attendee_id).exec()
+    if (!attendee.checkedIn) {
+      if (
+        attendee.waiverStatus.parent == true &&
+        attendee.waiverStatus.student == true
+      ) {
+        attendee.checkedIn = true
+        await attendee.save()
+        res.status(200).json({ message: 'Checked in!' })
+      } else {
+        res.status(400).json({
+          message: 'Not all waivers have been signed, cannot checkin.'
+        })
+      }
+    } else {
+      res
+        .status(400)
+        .json({ message: 'This attendee has already been checked in.' })
+    }
+  } catch (e) {
+    res.sendStatus(500)
+  }
 })
 
 module.exports = router
