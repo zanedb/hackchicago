@@ -6,20 +6,6 @@ const router = express.Router()
 const { notifyStat } = require('../discordBot')
 const scrapeIt = require('scrape-it')
 
-function checkLink(url) {
-  // https://stackoverflow.com/a/14582229
-  const urlRegex = new RegExp(
-    '^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-      '(\\#[-a-z\\d_]*)?$',
-    'i'
-  ) // fragment locator
-  return urlRegex.test(url)
-}
-
 // Absolute path: /v1/projects
 router
   .route('/')
@@ -68,24 +54,29 @@ router
               attr: 'src',
               convert: img => `https:${img}`
             }
-          }).then(async ({ data, response }) => {
-            if (data.title && data.desc && data.image) {
-              const project = new Project()
-              project.link = req.body.link
-              project.name = data.title
-              project.tagline = data.desc
-              project.timestamp = new Date().toISOString()
-              await project.save()
-              res.json({ message: 'Project created!' })
-              notifyStat(
-                `API: SUCCESS created PROJECT with NAME ${
-                  project.name
-                }, by EMAIL ${req.user.email}`
-              )
-            } else {
-              res.sendStatus(500)
-            }
           })
+            .then(async ({ data, response }) => {
+              if (data.title && data.desc && data.image) {
+                const project = new Project()
+                project.link = req.body.link
+                project.name = data.title
+                project.tagline = data.desc
+                project.submitter = {
+                  id: req.user.id
+                }
+                project.timestamp = new Date().toISOString()
+                await project.save()
+                res.json({ message: 'Project created!' })
+                notifyStat(
+                  `API: SUCCESS created PROJECT with NAME ${
+                    project.name
+                  }, by EMAIL ${req.user.email}`
+                )
+              }
+            })
+            .catch(err => {
+              res.sendStatus(500)
+            })
         } else {
           res
             .status(400)
