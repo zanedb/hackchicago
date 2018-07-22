@@ -28,6 +28,7 @@ router
           },
           id: project._id
         }
+        if (project.tableId) editedProject.tableId = project.tableId
         if (req.user.role === 'admin') editedProject.upvotes = upvotes.length
         editedProjects.push(editedProject)
       }
@@ -106,32 +107,64 @@ router
   })
 
 // Absolute path: /v1/projects/:project_id
-router.route('/:project_id').get(async (req, res) => {
-  try {
-    const project = await Project.findById(req.params.project_id).exec()
-    const attendee = await Attendee.findById(project.submitter.id).exec()
-    const upvotes = await Upvote.find({
-      projectId: req.params.project_id
-    }).exec()
-    // don't reveal sensitive info (i.e. email)
-    const editedProject = {
-      name: project.name,
-      link: project.link,
-      tagline: project.tagline,
-      timestamp: project.timestamp,
-      image: project.image,
-      submitter: {
-        name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
-      },
-      id: project._id
+router
+  .route('/:project_id')
+  .get(async (req, res) => {
+    try {
+      const project = await Project.findById(req.params.project_id).exec()
+      const attendee = await Attendee.findById(project.submitter.id).exec()
+      const upvotes = await Upvote.find({
+        projectId: req.params.project_id
+      }).exec()
+      // don't reveal sensitive info (i.e. email)
+      const editedProject = {
+        name: project.name,
+        link: project.link,
+        tagline: project.tagline,
+        timestamp: project.timestamp,
+        image: project.image,
+        submitter: {
+          name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
+        },
+        id: project._id
+      }
+      if (project.tableId) editedProject.tableId = project.tableId
+      if (req.user.role === 'admin') editedProject.upvotes = upvotes.length
+      res.json(editedProject)
+    } catch (e) {
+      console.log(e)
+      res.sendStatus(500)
     }
-    if (req.user.role === 'admin') editedProject.upvotes = upvotes.length
-    res.json(editedProject)
-  } catch (e) {
-    console.log(e)
-    res.sendStatus(500)
-  }
-})
+  })
+  .put(async (req, res) => {
+    try {
+      if (req.user.role === 'admin') {
+        const project = await Project.findById(req.params.project_id).exec()
+        if (req.body.tableId) {
+          project.tableId = req.body.tableId
+          await attendee.save()
+
+          res.json({ message: 'Attendee updated!' })
+          notifyStat(
+            `API: SUCCESS updated attendee with ID ${req.params.attendee_id}`
+          )
+        }
+      }
+    } catch (e) {
+      res.status(400).json({ message: 'Attendee not updated!' })
+    }
+  })
+  .delete(async (req, res) => {
+    if (req.user.role === 'admin') {
+      const project = await Project.remove({ _id: req.params.project_id })
+      notifyStat(
+        `API: Successfully deleted attendee by ID ${req.params.project_id}`
+      )
+      res.json({ message: 'Successfully deleted project' })
+    } else {
+      res.status(401).json({ message: 'Please authenticate.' })
+    }
+  })
 
 // Absolute path: /v1/projects/:project_id/upvotes
 router
