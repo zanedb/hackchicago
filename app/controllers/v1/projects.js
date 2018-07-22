@@ -23,6 +23,7 @@ router
           tagline: project.tagline,
           timestamp: project.timestamp,
           upvotes: upvotes.length,
+          image: project.image,
           submitter: {
             name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
           },
@@ -64,6 +65,7 @@ router
                 project.submitter = {
                   id: req.user.id
                 }
+                project.image = data.image
                 project.timestamp = new Date().toISOString()
                 await project.save()
                 res.json({ message: 'Project created!' })
@@ -103,6 +105,7 @@ router.route('/:project_id').get(async (req, res) => {
       tagline: project.tagline,
       timestamp: project.timestamp,
       upvotes: upvotes.length,
+      image: project.image,
       submitter: {
         name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
       },
