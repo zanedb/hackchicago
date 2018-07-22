@@ -156,6 +156,7 @@ router
         }
       }
     } catch (e) {
+      console.log(e)
       res.sendStatus(500)
     }
   })
@@ -178,6 +179,7 @@ router
         }
       }
     } catch (e) {
+      console.log(e)
       res.sendStatus(500)
     }
   })
