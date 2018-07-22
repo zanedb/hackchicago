@@ -140,14 +140,13 @@ router
     try {
       if (req.user.role === 'admin') {
         const project = await Project.findById(req.params.project_id).exec()
-          project.tableId = req.body.tableId
-          await project.save()
+        project.tableId = req.body.tableId
+        await project.save()
 
-          res.json({ message: 'Project updated!' })
-          notifyStat(
-            `API: SUCCESS updated project with ID ${req.params.project_id}`
-          )
-        }
+        res.json({ message: 'Project updated!' })
+        notifyStat(
+          `API: SUCCESS updated project with ID ${req.params.project_id}`
+        )
       } else {
         res.status(401).json({ message: 'Please authenticate.' })
       }
