@@ -64,16 +64,16 @@ router
             .then(async ({ data, response }) => {
               if (data.title && data.desc) {
                 const project = new Project()
+                let image = 'https://placehold.it/512x256'
                 if (data.video) {
                   const youtubeVideoId = data.video.match(
                     /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i
                   )[1]
-                  project.image = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`
+                  image = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`
                 } else if (data.image !== 'https://') {
-                  project.image = data.image
-                } else {
-                  project.image = 'https://placehold.it/512x256'
+                  image = data.image
                 }
+                project.image = image
                 project.link = req.body.link
                 project.name = data.title
                 project.tagline = data.desc
@@ -221,5 +221,10 @@ router
       res.sendStatus(500)
     }
   })
+
+/*router.route('/refresh')
+  .post(async (req, res) => {
+
+  })*/
 
 module.exports = router
