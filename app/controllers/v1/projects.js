@@ -54,15 +54,23 @@ router
               selector: 'li.text-center:nth-child(1) > img:nth-child(1)',
               attr: 'src',
               convert: img => `https:${img}`
+            },
+            video: {
+              selector: '.video-embed',
+              attr: 'src'
             }
           })
             .then(async ({ data, response }) => {
-              if (
-                data.title &&
-                data.desc &&
-                data.image !== 'https:' &&
-                data.image
-              ) {
+              if (data.title && data.desc) {
+                if (data.video) {
+                  const youtubeVideoId = data.video.match(
+                    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i
+                  )[1]
+                  project.image = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`
+                }
+                if (data.image !== 'https://') {
+                  project.image = data.image
+                }
                 const project = new Project()
                 project.link = req.body.link
                 project.name = data.title
