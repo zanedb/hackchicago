@@ -51,9 +51,7 @@ router
   })
   // Create a project
   .post(async (req, res) => {
-    if (
-      req.body.link
-    ) {
+    if (req.body.link) {
       try {
         const projectResult = await Project.findOne({
           submitter: {
@@ -69,7 +67,7 @@ router
               attr: 'src',
               convert: img => `https:${img}`
             }
-          }).then(({ data, response }) => {
+          }).then(async ({ data, response }) => {
             if (data.title && data.desc && data.image) {
               const project = new Project()
               project.link = req.body.link
@@ -99,32 +97,30 @@ router
   })
 
 // Absolute path: /v1/projects/:project_id
-router
-  .route('/:project_id')
-  .get(async (req, res) => {
-    try {
-      const project = await Project.findById(req.params.project_id).exec()
-      const attendee = await Attendee.findById(project.submitter.id).exec()
-      const upvotes = await Upvote.find({
-        projectId: req.params.project_id
-      }).exec()
-      // don't reveal sensitive info (i.e. email)
-      const editedProject = {
-        name: project.name,
-        link: project.link,
-        tagline: project.tagline,
-        timestamp: project.timestamp,
-        upvotes: upvotes.length,
-        submitter: {
-          name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
-        },
-        id: project._id
-      }
-      res.json(editedProject)
-    } catch (e) {
-      res.sendStatus(500)
+router.route('/:project_id').get(async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.project_id).exec()
+    const attendee = await Attendee.findById(project.submitter.id).exec()
+    const upvotes = await Upvote.find({
+      projectId: req.params.project_id
+    }).exec()
+    // don't reveal sensitive info (i.e. email)
+    const editedProject = {
+      name: project.name,
+      link: project.link,
+      tagline: project.tagline,
+      timestamp: project.timestamp,
+      upvotes: upvotes.length,
+      submitter: {
+        name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
+      },
+      id: project._id
     }
-  })
+    res.json(editedProject)
+  } catch (e) {
+    res.sendStatus(500)
+  }
+})
 
 // Absolute path: /v1/projects/:project_id/upvotes
 router
