@@ -158,7 +158,7 @@ router
     if (req.user.role === 'admin') {
       const project = await Project.remove({ _id: req.params.project_id })
       notifyStat(
-        `API: Successfully deleted attendee by ID ${req.params.project_id}`
+        `API: Successfully deleted project by ID ${req.params.project_id}`
       )
       res.json({ message: 'Successfully deleted project' })
     } else {
