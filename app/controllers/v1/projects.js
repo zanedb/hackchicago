@@ -35,7 +35,6 @@ router
           name: project.name,
           link: project.link,
           tagline: project.tagline,
-          timestamp: project.timestamp,
           upvotes: upvotes.length,
           submitter: {
             name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
