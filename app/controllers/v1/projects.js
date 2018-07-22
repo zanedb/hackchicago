@@ -22,13 +22,13 @@ router
           link: project.link,
           tagline: project.tagline,
           timestamp: project.timestamp,
-          upvotes: upvotes.length,
           image: project.image,
           submitter: {
             name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
           },
           id: project._id
         }
+        if (req.user.role === 'admin') editedProject.upvotes = upvotes.length
         editedProjects.push(editedProject)
       }
       res.json(editedProjects)
@@ -57,7 +57,12 @@ router
             }
           })
             .then(async ({ data, response }) => {
-              if (data.title && data.desc && data.image) {
+              if (
+                data.title &&
+                data.desc &&
+                data.image !== 'https:' &&
+                data.image
+              ) {
                 const project = new Project()
                 project.link = req.body.link
                 project.name = data.title
@@ -104,13 +109,13 @@ router.route('/:project_id').get(async (req, res) => {
       link: project.link,
       tagline: project.tagline,
       timestamp: project.timestamp,
-      upvotes: upvotes.length,
       image: project.image,
       submitter: {
         name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
       },
       id: project._id
     }
+    if (req.user.role === 'admin') editedProject.upvotes = upvotes.length
     res.json(editedProject)
   } catch (e) {
     console.log(e)
