@@ -70,7 +70,7 @@ router
                     /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i
                   )[1]
                   image = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`
-                } else if (data.image !== 'https://') {
+                } else if (data.image !== 'https:') {
                   image = data.image
                 }
                 project.image = image
