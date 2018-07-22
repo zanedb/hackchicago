@@ -67,9 +67,10 @@ router
                     /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i
                   )[1]
                   project.image = `https://i.ytimg.com/vi/${youtubeVideoId}/maxresdefault.jpg`
-                }
-                if (data.image !== 'https://') {
+                } else if (data.image !== 'https://') {
                   project.image = data.image
+                } else {
+                  project.image = 'https://placehold.it/512x256'
                 }
                 const project = new Project()
                 project.link = req.body.link
@@ -90,6 +91,7 @@ router
               }
             })
             .catch(err => {
+              console.log(err)
               res.sendStatus(500)
             })
         } else {
