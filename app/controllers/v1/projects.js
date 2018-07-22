@@ -4,6 +4,7 @@ const Attendee = require('../../models/attendee')
 const Upvote = require('../../models/upvote')
 const router = express.Router()
 const { notifyStat } = require('../discordBot')
+const scrapeIt = require('scrape-it')
 
 function checkLink(url) {
   // https://stackoverflow.com/a/14582229
@@ -34,7 +35,6 @@ router
           name: project.name,
           link: project.link,
           tagline: project.tagline,
-          description: project.description,
           timestamp: project.timestamp,
           upvotes: upvotes.length,
           submitter: {
@@ -52,11 +52,7 @@ router
   // Create a project
   .post(async (req, res) => {
     if (
-      req.body.name &&
-      req.body.link &&
-      checkLink(req.body.link) &&
-      req.body.tagline &&
-      req.body.description
+      req.body.link
     ) {
       try {
         const projectResult = await Project.findOne({
@@ -65,23 +61,32 @@ router
           }
         }).exec()
         if (!projectResult) {
-          const project = new Project()
-          project.name = req.body.name
-          project.submitter = {
-            id: req.user.id
-          }
-          project.link = req.body.link
-          project.tagline = req.body.tagline
-          project.description = req.body.description
-          project.timestamp = new Date().toISOString()
-
-          await project.save()
-          res.json({ message: 'Project created!' })
-          notifyStat(
-            `API: SUCCESS created PROJECT with NAME ${
-              req.body.name
-            }, by EMAIL ${req.user.email}`
-          )
+          scrapeIt(req.body.link, {
+            title: '#app-title',
+            desc: '.large',
+            image: {
+              selector: 'li.text-center:nth-child(1) > img:nth-child(1)',
+              attr: 'src',
+              convert: img => `https:${img}`
+            }
+          }).then(({ data, response }) => {
+            if (data.title && data.desc && data.image) {
+              const project = new Project()
+              project.link = req.body.link
+              project.name = data.title
+              project.tagline = data.tagline
+              project.timestamp = new Date().toISOString()
+              await project.save()
+              res.json({ message: 'Project created!' })
+              notifyStat(
+                `API: SUCCESS created PROJECT with NAME ${
+                  project.name
+                }, by EMAIL ${req.user.email}`
+              )
+            } else {
+              res.sendStatus(500)
+            }
+          })
         } else {
           res
             .status(400)
@@ -108,7 +113,6 @@ router
         name: project.name,
         link: project.link,
         tagline: project.tagline,
-        description: project.description,
         timestamp: project.timestamp,
         upvotes: upvotes.length,
         submitter: {
@@ -119,64 +123,6 @@ router
       res.json(editedProject)
     } catch (e) {
       res.sendStatus(500)
-    }
-  })
-  .put(async (req, res) => {
-    try {
-      const project = await Project.findById(req.params.project_id).exec()
-      if (project.submitter.id === req.user._id.toString()) {
-        if (
-          req.body.name ||
-          req.body.link ||
-          req.body.tagline ||
-          req.body.description
-        ) {
-          let changed = false
-          if (req.body.name && req.body.name !== project.name) {
-            project.name = req.body.name
-            changed = true
-          }
-          if (
-            req.body.link &&
-            checkLink(req.body.link) &&
-            req.body.link !== project.link
-          ) {
-            project.link = req.body.link
-            changed = true
-          }
-          if (req.body.tagline && req.body.tagline !== project.tagline) {
-            project.tagline = req.body.tagline
-            changed = true
-          }
-          if (
-            req.body.description &&
-            req.body.description !== project.description
-          ) {
-            project.description = req.body.description
-            changed = true
-          }
-
-          if (changed) {
-            await project.save()
-            res.json({ message: 'Project updated!' })
-            notifyStat(
-              `API: SUCCESS updated project with NAME ${project.name}, ID ${
-                req.params.attendee_id
-              }`
-            )
-          } else {
-            res.sendStatus(400)
-          }
-        } else {
-          res.sendStatus(400)
-        }
-      } else {
-        res
-          .status(401)
-          .json({ message: 'You do not have access to this project.' })
-      }
-    } catch (e) {
-      res.status(400).json({ message: 'Project not updated!' })
     }
   })
 
