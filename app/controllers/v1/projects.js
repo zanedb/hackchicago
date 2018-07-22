@@ -64,7 +64,7 @@ router
             .then(async ({ data, response }) => {
               if (data.title && data.desc) {
                 const project = new Project()
-                let image = 'https://placehold.it/512x256'
+                let image = 'https://app.hackchicago.io/no_image.png'
                 if (data.video) {
                   const youtubeVideoId = data.video.match(
                     /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i

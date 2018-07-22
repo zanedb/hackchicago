@@ -11,7 +11,8 @@ const ProjectSchema = new Schema({
   tagline: String,
   description: String,
   timestamp: String,
-  tableId: String
+  tableId: String,
+  image: String
 })
 
 module.exports = mongoose.model('Project', ProjectSchema)
