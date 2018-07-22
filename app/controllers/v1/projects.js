@@ -62,6 +62,7 @@ router
           })
             .then(async ({ data, response }) => {
               if (data.title && data.desc) {
+                const project = new Project()
                 if (data.video) {
                   const youtubeVideoId = data.video.match(
                     /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i
@@ -72,7 +73,6 @@ router
                 } else {
                   project.image = 'https://placehold.it/512x256'
                 }
-                const project = new Project()
                 project.link = req.body.link
                 project.name = data.title
                 project.tagline = data.desc
