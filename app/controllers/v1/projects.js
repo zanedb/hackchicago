@@ -35,6 +35,7 @@ router
           name: project.name,
           link: project.link,
           tagline: project.tagline,
+          timestamp: project.timestamp,
           upvotes: upvotes.length,
           submitter: {
             name: `${attendee.fname} ${attendee.lname.charAt(0)}.`
@@ -45,6 +46,7 @@ router
       }
       res.json(editedProjects)
     } catch (error) {
+      console.log(error)
       res.sendStatus(500)
     }
   })
@@ -71,7 +73,7 @@ router
               const project = new Project()
               project.link = req.body.link
               project.name = data.title
-              project.tagline = data.tagline
+              project.tagline = data.desc
               project.timestamp = new Date().toISOString()
               await project.save()
               res.json({ message: 'Project created!' })
@@ -117,6 +119,7 @@ router.route('/:project_id').get(async (req, res) => {
     }
     res.json(editedProject)
   } catch (e) {
+    console.log(e)
     res.sendStatus(500)
   }
 })
