@@ -155,14 +155,19 @@ router
     }
   })
   .delete(async (req, res) => {
-    if (req.user.role === 'admin') {
-      const project = await Project.remove({ _id: req.params.project_id })
-      notifyStat(
-        `API: Successfully deleted project by ID ${req.params.project_id}`
-      )
-      res.json({ message: 'Successfully deleted project' })
-    } else {
-      res.status(401).json({ message: 'Please authenticate.' })
+    try {
+      if (req.user.role === 'admin') {
+        const project = await Project.remove({ _id: req.params.project_id })
+        notifyStat(
+          `API: Successfully deleted project by ID ${req.params.project_id}`
+        )
+        res.json({ message: 'Successfully deleted project' })
+      } else {
+        res.status(401).json({ message: 'Please authenticate.' })
+      }
+    } catch (e) {
+      console.log(e)
+      res.sendStatus(500)
     }
   })
 
